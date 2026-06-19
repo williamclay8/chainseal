@@ -65,6 +65,14 @@ Never store secrets, env values, OAuth URLs, wallet/private-key material, raw tr
 - Clude batch-store and extract-skill tools require a separate governance pass before use.
 - Hosted/remote Clude requires `secret-env-safety-audit` and owner approval.
 
+## Governance Lifecycle
+
+- Owner: Clay / Full Blast controller.
+- Review cadence: after Clude SDK/MCP version changes, during normal skill-stack audits, and after any recall-quality, trigger-overlap, or secret-boundary miss.
+- Removal condition: remove `clude-local` and retire the global skill if it over-triggers, duplicates Supermemory without improving recall, stores sensitive data, weakens source-truth verification, or its canary fails.
+- Router location: `/Users/clay/.agents/skills/clude-codex-memory`, with Full Blast invoking `skill-governance-gate` before any expansion beyond the local pilot.
+- Decision log: `/Users/clay/.agents/skill-stack/decision-log.md`, section `2026-06-19 Clude Codex Memory Pilot`.
+
 ## Canary Checks
 
 Run:

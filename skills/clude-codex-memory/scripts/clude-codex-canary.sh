@@ -15,29 +15,35 @@ say "root=$ROOT"
 if ! command -v codex >/dev/null 2>&1; then
   bad "codex CLI is not available"
 else
-  MCP_LIST="$(codex mcp list 2>/dev/null || true)"
-  if printf '%s\n' "$MCP_LIST" | grep -q 'clude-local'; then
+  MCP_ENTRY="$(codex mcp get clude-local 2>/dev/null || true)"
+  if [ -n "$MCP_ENTRY" ] && printf '%s\n' "$MCP_ENTRY" | grep -q '^clude-local$'; then
     pass "codex MCP entry clude-local exists"
   else
     bad "codex MCP entry clude-local is missing"
   fi
 
-  if printf '%s\n' "$MCP_LIST" | grep -q '@clude/sdk@3.2.0'; then
+  if printf '%s\n' "$MCP_ENTRY" | grep -Eq '^[[:space:]]*command: npx$'; then
+    pass "clude-local uses npx"
+  else
+    bad "clude-local does not visibly use npx"
+  fi
+
+  if printf '%s\n' "$MCP_ENTRY" | grep -Eq '^[[:space:]]*args: -y @clude/sdk@3[.]2[.]0 mcp-serve --local$'; then
     pass "Clude SDK package is pinned to @clude/sdk@3.2.0"
   else
-    bad "Clude SDK package is not visibly pinned to @clude/sdk@3.2.0"
+    bad "clude-local args are not visibly pinned to @clude/sdk@3.2.0"
   fi
 
-  if printf '%s\n' "$MCP_LIST" | grep -q 'mcp-serve.*--local'; then
+  if printf '%s\n' "$MCP_ENTRY" | grep -Eq '^[[:space:]]*args: .*mcp-serve --local$'; then
     pass "Clude MCP uses mcp-serve --local"
   else
-    bad "Clude MCP does not visibly use mcp-serve --local"
+    bad "clude-local does not visibly use mcp-serve --local"
   fi
 
-  if printf '%s\n' "$MCP_LIST" | grep -A2 -B2 'clude-local' | grep -q 'CORTEX_API_KEY'; then
+  if printf '%s\n' "$MCP_ENTRY" | grep -q 'CORTEX_API_KEY'; then
     bad "clude-local appears to include hosted CORTEX_API_KEY env"
   else
-    pass "clude-local does not expose hosted CORTEX_API_KEY in redacted MCP list"
+    pass "clude-local does not expose hosted CORTEX_API_KEY in redacted MCP entry"
   fi
 fi
 
