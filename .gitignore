@@ -1,0 +1,5 @@
+.env
+node_modules/
+.mcp.json
+.clude-canary.log
+*.tgz
