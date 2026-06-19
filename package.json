@@ -1,0 +1,48 @@
+{
+  "name": "codex-memory-control-plane",
+  "version": "0.1.0",
+  "description": "Source-backed memory firewall and control plane for coding agents using Clude, Supermemory, and repo truth.",
+  "type": "module",
+  "bin": {
+    "codex-memory-control-plane": "./bin/codex-memory.mjs",
+    "codex-memory": "./bin/codex-memory.mjs",
+    "codex-memory-gate": "./bin/codex-memory-gate.mjs",
+    "codex-memory-canary": "./bin/codex-memory-canary.sh"
+  },
+  "files": [
+    "bin/",
+    "docs/codex-memory-control-plane.md",
+    "docs/productization-roadmap.md",
+    "skills/clude-codex-memory/SKILL.md",
+    "skills/clude-codex-memory/agents/openai.yaml",
+    "skills/clude-codex-memory/references/control-plane.md",
+    "skills/clude-codex-memory/scripts/clude-codex-canary.sh",
+    "skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh",
+    "skills/clude-codex-memory/scripts/codex-memory-gate.mjs",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --check skills/clude-codex-memory/scripts/codex-memory-gate.mjs && bash -n skills/clude-codex-memory/scripts/clude-codex-canary.sh && bash -n skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh",
+    "test": "npm run check && skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh .",
+    "test:clude": "skills/clude-codex-memory/scripts/clude-codex-canary.sh .",
+    "pack:dry": "npm pack --dry-run"
+  },
+  "keywords": [
+    "ai-agent",
+    "memory",
+    "mcp",
+    "codex",
+    "clude",
+    "supermemory",
+    "source-truth",
+    "prompt-injection",
+    "security"
+  ],
+  "author": "Clay Hooten",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
