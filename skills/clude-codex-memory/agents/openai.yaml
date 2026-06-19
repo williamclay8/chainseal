@@ -1,4 +1,0 @@
-interface:
-  display_name: "Clude Codex Memory"
-  short_description: "Gated Clude MCP memory pilot for Codex"
-  default_prompt: "Use $clude-codex-memory to plan a safe local Clude MCP memory pilot for Codex."

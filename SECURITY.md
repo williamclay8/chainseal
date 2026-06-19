@@ -1,10 +1,10 @@
 # Security
 
-Codex Memory Control Plane is designed to fail closed.
+Chainseal is designed to fail closed.
 
 ## Default Boundaries
 
-- No hosted Clude by default.
+- No hosted memory backend by default.
 - No remote MCP by default.
 - No `.env` or `.mcp.json` required.
 - No raw transcript storage.
@@ -27,9 +27,9 @@ Then inspect the tarball manifest for accidental private files.
 
 Run a separate secret/environment safety review before:
 
-- hosted Clude;
+- hosted memory backends;
 - remote MCP endpoints;
-- Supabase or pgvector;
+- vector databases;
 - wallets or private keys;
 - provider logs;
 - OAuth URLs;

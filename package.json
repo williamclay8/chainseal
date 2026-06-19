@@ -1,47 +1,47 @@
 {
-  "name": "codex-memory-control-plane",
+  "name": "chainseal",
   "version": "0.1.0",
-  "description": "Source-backed memory firewall and control plane for coding agents using Clude, Supermemory, and repo truth.",
+  "description": "Source-backed memory firewall and trust boundary for coding agents.",
   "type": "module",
   "bin": {
-    "codex-memory-control-plane": "./bin/codex-memory.mjs",
-    "codex-memory": "./bin/codex-memory.mjs",
-    "codex-memory-gate": "./bin/codex-memory-gate.mjs",
-    "codex-memory-canary": "./bin/codex-memory-canary.sh"
+    "chainseal": "./bin/chainseal.mjs",
+    "chainseal-gate": "./bin/chainseal-gate.mjs",
+    "chainseal-canary": "./bin/chainseal-canary.sh"
   },
   "files": [
     "bin/",
-    "docs/codex-memory-control-plane.md",
+    "docs/chainseal-architecture.md",
     "docs/productization-roadmap.md",
-    "skills/clude-codex-memory/SKILL.md",
-    "skills/clude-codex-memory/agents/openai.yaml",
-    "skills/clude-codex-memory/references/control-plane.md",
-    "skills/clude-codex-memory/scripts/clude-codex-canary.sh",
-    "skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh",
-    "skills/clude-codex-memory/scripts/codex-memory-gate.mjs",
+    "skills/chainseal/SKILL.md",
+    "skills/chainseal/agents/openai.yaml",
+    "skills/chainseal/references/control-plane.md",
+    "skills/chainseal/scripts/chainseal-canary.sh",
+    "skills/chainseal/scripts/chainseal-gate.mjs",
     "README.md",
     "SECURITY.md",
     "LICENSE"
   ],
   "scripts": {
-    "check": "node --check skills/clude-codex-memory/scripts/codex-memory-gate.mjs && bash -n skills/clude-codex-memory/scripts/clude-codex-canary.sh && bash -n skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh",
-    "test": "npm run check && skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh .",
-    "test:clude": "skills/clude-codex-memory/scripts/clude-codex-canary.sh .",
+    "check": "node --check skills/chainseal/scripts/chainseal-gate.mjs && bash -n skills/chainseal/scripts/chainseal-canary.sh",
+    "test": "npm run check && skills/chainseal/scripts/chainseal-canary.sh .",
     "pack:dry": "npm pack --dry-run"
   },
   "keywords": [
     "ai-agent",
+    "agent-memory",
     "memory",
     "mcp",
-    "codex",
-    "clude",
-    "supermemory",
+    "provenance",
     "source-truth",
     "prompt-injection",
     "security"
   ],
   "author": "Clay Hooten",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/williamclay8/chainseal.git"
+  },
   "engines": {
     "node": ">=18"
   }

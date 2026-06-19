@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chainseal"
+  short_description: "Source-backed memory firewall for coding agents"
+  default_prompt: "Use $chainseal to decide whether this agent memory should be stored, recalled, audited, or blocked."

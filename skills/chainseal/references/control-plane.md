@@ -1,12 +1,12 @@
-# Codex Memory Control Plane Reference
+# Chainseal Control Plane Reference
 
-Use this when Clude memory should become safer, more Codex-native, or more robust than Clude alone.
+Use this when agent memory should become safer, source-backed, or more robust than backend recall alone.
 
 ## Core Rule
 
-Clude is a backend. Codex owns the control plane.
+Memory backends store and recall content. Chainseal owns the trust boundary.
 
-Before a memory reaches Clude, Codex should decide:
+Before a memory reaches a backend, Chainseal should decide:
 
 - whether the candidate is safe to store;
 - which surface should own it;
@@ -19,7 +19,7 @@ Before a memory reaches Clude, Codex should decide:
 
 ```text
 candidate memory
-  -> codex-memory-gate.mjs
+  -> chainseal-gate.mjs
   -> source truth resolver
   -> redaction/sensitivity check
   -> route decision
@@ -32,10 +32,10 @@ candidate memory
 
 | Candidate | Preferred store |
 | --- | --- |
-| Repo rule, command, deploy fact, package version | Repo docs or `AGENTS.md` |
-| Active goal state | GoalBuddy |
-| Cross-session preference or durable pattern | Supermemory, optionally Clude |
-| Local associative recall experiment | Clude local |
+| Repo rule, command, deploy fact, package version | Repo docs or project instructions |
+| Active goal state | Active task board |
+| Cross-session preference or durable pattern | Cross-session memory |
+| Local associative recall experiment | Local backend |
 | Secret, raw transcript, unsupported claim | No store |
 
 ## Candidate Gate
@@ -43,7 +43,7 @@ candidate memory
 Run:
 
 ```bash
-node scripts/codex-memory-gate.mjs candidate.json
+node scripts/chainseal-gate.mjs candidate.json
 ```
 
 The gate fails closed for:
@@ -87,8 +87,7 @@ When a fact changes, append a new receipt and link it to the older one. Do not s
 Run:
 
 ```bash
-scripts/clude-codex-canary.sh
-scripts/codex-memory-control-plane-canary.sh
+scripts/chainseal-canary.sh
 ```
 
 Minimum behavior:
@@ -99,13 +98,12 @@ Minimum behavior:
 - block unsupported/source-free memory;
 - block instruction-injection-shaped memory;
 - route mutation actions to review;
-- keep repo `.env` and `.mcp.json` absent;
-- keep Clude MCP pinned and local.
+- keep repo `.env` and `.mcp.json` absent.
 
 ## No-Go Actions
 
-- Do not run Clude hosted/remote/setup/register/init/connect/mcp-install commands without explicit approval.
+- Do not run hosted or remote backend commands without explicit approval.
 - Do not store secrets, env values, OAuth URLs, wallet/private-key material, customer data, provider logs, or raw transcripts.
-- Do not treat Clude, Supermemory, or `find_clinamen` recall as proof.
+- Do not treat backend recall as proof.
 - Do not expose recalled memory to subagents unless scoped, redacted, and source-bound.
-- Do not delete `~/.clude` data without explicit owner approval.
+- Do not delete local backend data without explicit owner approval.

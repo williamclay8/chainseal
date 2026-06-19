@@ -2,15 +2,21 @@
 
 ## Product
 
-Working name: Codex Memory Control Plane.
+Final name: Chainseal.
 
-Positioning: a memory firewall and trust layer for coding agents. Clude, Mem0, Letta, Zep, and similar systems focus on storing and retrieving memory. This product decides whether memory is safe, sourced, current, and actionable before it enters or leaves a memory backend.
+Positioning: memory trust boundary for coding agents. Memory backends focus on storing and retrieving content; Chainseal decides whether memory is safe, sourced, current, and actionable before it enters or leaves a backend.
+
+Tagline:
+
+```text
+Only trusted memory crosses the line.
+```
 
 ## Wedge
 
 Start with developers and teams already using coding agents heavily:
 
-- Codex and Claude Code power users;
+- coding-agent power users;
 - teams adopting MCP tools;
 - teams worried about prompt injection, stale memory, or secret leakage;
 - agent builders who want memory without trusting raw transcript storage.
@@ -25,11 +31,11 @@ Give your coding agent memory without letting memory become an unsourced, stale,
 
 Phase 1 ships as an npm CLI and skill pack:
 
-- `codex-memory gate candidate.json`
-- `codex-memory canary /path/to/repo`
+- `chainseal gate candidate.json`
+- `chainseal canary /path/to/repo`
 - source-backed memory candidate schema;
 - replayable safety canaries;
-- Codex skill wrapper for local Clude pilots.
+- portable agent workflow wrapper.
 
 No hosted service is required for the MVP.
 
@@ -40,12 +46,12 @@ No hosted service is required for the MVP.
 - CLI gate.
 - Canary harness.
 - Local docs and skill pack.
-- Clude local pilot wrapper.
+- Backend adapter contract.
 
 ### Pro Local
 
 - Append-only receipt ledger.
-- Recall broker that merges repo docs, Supermemory, GoalBuddy receipts, and Clude.
+- Recall broker that merges repo docs, task receipts, and configured memory stores.
 - Stale-memory and contradiction audit.
 - MCP descriptor drift audit.
 
@@ -70,14 +76,14 @@ No hosted service is required for the MVP.
 
 Before public npm publish:
 
-- Pick final package name and owner scope.
-- Replace Clay-specific skill wording with neutral operator wording or keep it as an example skill.
+- Keep the package name, CLI, docs, and skill pack branded as Chainseal.
+- Use descriptive compatibility copy instead of third-party product marks in the package name.
 - Add repository URL after the remote exists.
-- Add public issue/security contact.
+- Add public issue/security contact before accepting external reports.
 - Run `npm test`.
 - Run `npm run pack:dry` and inspect tarball contents.
-- Run disposable-directory install test from the tarball.
-- Decide license and trademark posture around the word "Codex".
+- Run disposable-directory install test from the generated tarball.
+- Confirm package/version availability.
 
 Before hosted product:
 
@@ -91,13 +97,13 @@ Before hosted product:
 ## Immediate Next Builds
 
 1. Receipt ledger under a user-approved local path.
-2. `codex-memory store` wrapper that writes only after the gate allows.
-3. `codex-memory recall` broker that returns trust-ranked recall packets.
-4. `codex-memory audit` for stale, source-missing, contradictory, or secret-like memories.
+2. `chainseal store` wrapper that writes only after the gate allows.
+3. `chainseal recall` broker that returns trust-ranked recall packets.
+4. `chainseal audit` for stale, source-missing, contradictory, or secret-like memories.
 5. Local MCP facade after CLI behavior proves useful.
 
 ## Launch Copy
 
 Memory for coding agents, without the amnesia or the poison.
 
-Codex Memory Control Plane gives agent memory a source-truth layer: every memory candidate is screened for secrets, transcripts, unsupported claims, and prompt-injection patterns before it reaches a backend like Clude. Recall comes back as evidence, not orders.
+Chainseal gives agent memory a source-truth layer: every memory candidate is screened for secrets, transcripts, unsupported claims, and prompt-injection patterns before it reaches a backend. Recall comes back as evidence, not orders.

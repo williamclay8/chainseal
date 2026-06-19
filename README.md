@@ -1,14 +1,14 @@
-# Codex Memory Control Plane
+# Chainseal
 
-Source-backed memory firewall and control plane for coding agents.
+Only trusted memory crosses the line.
 
-Clude made agent memory easy to distribute. This project makes memory safer for coding agents: every memory candidate is screened before it reaches Clude, Supermemory, or another store, and every recall is treated as a lead until source truth verifies it.
+Chainseal is a source-backed memory firewall for coding agents. It screens memory candidates before they reach a backend, blocks unsafe or unsupported content, and treats recall as evidence to verify instead of instructions to obey.
 
 ## Why
 
 Agent memory is not just storage. It is a durable attack surface.
 
-This package adds a deterministic layer that blocks:
+Chainseal blocks:
 
 - secret-like strings;
 - raw transcript-shaped content;
@@ -30,13 +30,13 @@ npm test
 After publishing:
 
 ```bash
-npx codex-memory-control-plane gate candidate.json
+npx chainseal gate candidate.json
 ```
 
 or:
 
 ```bash
-npx -p codex-memory-control-plane codex-memory-gate candidate.json
+npx -p chainseal chainseal-gate candidate.json
 ```
 
 ## CLI
@@ -44,25 +44,25 @@ npx -p codex-memory-control-plane codex-memory-gate candidate.json
 Validate a candidate memory:
 
 ```bash
-codex-memory gate candidate.json
+chainseal gate candidate.json
 ```
 
 or:
 
 ```bash
-codex-memory-gate candidate.json
+chainseal-gate candidate.json
 ```
 
 Run the canary suite:
 
 ```bash
-codex-memory canary /path/to/repo
+chainseal canary /path/to/repo
 ```
 
 or:
 
 ```bash
-codex-memory-canary /path/to/repo
+chainseal-canary /path/to/repo
 ```
 
 Candidate example:
@@ -71,13 +71,13 @@ Candidate example:
 {
   "action": "store",
   "type": "semantic",
-  "content": "Clude local pilot is pinned to @clude/sdk@3.2.0 and uses mcp-serve --local.",
+  "content": "Chainseal requires source-backed memories before storage.",
   "source_refs": [
-    { "kind": "file", "ref": "docs/clude-codex-pilot.md", "status": "verified" }
+    { "kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified" }
   ],
   "evidence": { "status": "verified" },
   "sensitivity": "internal",
-  "target_store": "clude-local",
+  "target_store": "backend-local",
   "lumi": {
     "local": "clean",
     "committed": true,
@@ -91,27 +91,27 @@ Candidate example:
 
 The first distributable product is a local CLI and skill pack:
 
-- `codex-memory-gate`: deterministic pre-store policy.
-- `codex-memory-canary`: replayable safety checks.
-- `skills/clude-codex-memory`: Codex skill wrapper and references.
-- `docs/codex-memory-control-plane.md`: architecture and roadmap.
+- `chainseal-gate`: deterministic pre-store policy.
+- `chainseal-canary`: replayable safety checks.
+- `skills/chainseal`: portable agent workflow wrapper and references.
+- `docs/chainseal-architecture.md`: architecture and roadmap.
 
 The next product step is a local MCP facade exposing:
 
-- `codex_memory_propose_store`
-- `codex_memory_recall_packet`
-- `codex_memory_audit`
-- `codex_memory_receipt`
+- `chainseal_propose_store`
+- `chainseal_recall_packet`
+- `chainseal_audit`
+- `chainseal_receipt`
 
-## Relationship To Clude
+## Backend Adapters
 
-Clude remains a memory backend. This project is the control plane in front of it.
+Chainseal sits in front of memory backends. Backends may store or retrieve content, but Chainseal owns the trust boundary: whether a candidate is safe, sourced, current, and actionable.
 
-Use Clude for local persistent recall after the gate has accepted a compact, source-backed memory. Do not use Clude recall as proof; verify against repo files, tests, git, CI, provider state, or live URLs before acting.
+Use backend recall as a lead. Verify against repo files, tests, git, CI, provider state, or live URLs before acting.
 
 ## Safety
 
-Read [SECURITY.md](SECURITY.md) before connecting this to hosted Clude, remote MCPs, Supabase, wallets, provider logs, or secret-bearing workflows.
+Read [SECURITY.md](SECURITY.md) before connecting Chainseal to hosted memory backends, remote MCP endpoints, vector databases, wallets, provider logs, or secret-bearing workflows.
 
 ## Status
 

@@ -25,7 +25,6 @@ const secretPatterns = [
   /\b(sk|pk|rk|clk)_[A-Za-z0-9_-]{16,}\b/,
   /\bBearer\s+[A-Za-z0-9._~+/=-]{16,}\b/i,
   /\bSUPABASE_SERVICE_KEY\b/i,
-  /\bCORTEX_API_KEY\b/i,
   /\bOPENAI_API_KEY\b/i,
   /\bANTHROPIC_API_KEY\b/i,
   /\b(wallet|private key|seed phrase|mnemonic)\b/i,
@@ -34,7 +33,7 @@ const secretPatterns = [
 const rawTranscriptPatterns = [
   /^\s*(user|assistant|system|developer|tool):/im,
   /<\|im_start\|>|<\|im_end\|>/i,
-  /BEGIN COMPOUND CODEX TOOL MAP/i,
+  /BEGIN .* TOOL MAP/i,
   /SUPERMEMORY CONTEXT/i,
 ];
 
@@ -46,7 +45,7 @@ const instructionInjectionPatterns = [
 
 function usage() {
   return [
-    "Usage: codex-memory-gate.mjs <candidate.json>",
+    "Usage: chainseal-gate.mjs <candidate.json>",
     "",
     "Candidate fields:",
     "  action: store | recall | delete | update | list | batch | extract",
@@ -55,7 +54,7 @@ function usage() {
     "  source_refs: [{ kind, ref, status }]",
     "  evidence: { status }",
     "  sensitivity: public | internal | private | secret",
-    "  target_store: clude-local | supermemory | repo | goalbuddy",
+    "  target_store: backend-local | repo | task-board | cross-session | other",
     "  lumi: { local, committed, pushed, deployed_live }",
   ].join("\n");
 }

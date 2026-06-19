@@ -1,5 +1,5 @@
 .env
 node_modules/
 .mcp.json
-.clude-canary.log
+.chainseal-canary.log
 *.tgz

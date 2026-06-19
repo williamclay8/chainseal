@@ -8,13 +8,12 @@ const [, , command, ...args] = process.argv;
 
 function usage() {
   console.log(`Usage:
-  codex-memory gate <candidate.json>
-  codex-memory canary [repo-root]
+  chainseal gate <candidate.json>
+  chainseal canary [repo-root]
 
 Aliases:
-  codex-memory-control-plane gate <candidate.json>
-  codex-memory-gate <candidate.json>
-  codex-memory-canary [repo-root]`);
+  chainseal-gate <candidate.json>
+  chainseal-canary [repo-root]`);
 }
 
 if (!command || command === "help" || command === "--help" || command === "-h") {
@@ -25,12 +24,12 @@ if (!command || command === "help" || command === "--help" || command === "-h") 
 if (command === "gate") {
   process.argv = [
     process.argv[0],
-    path.join(root, "skills/clude-codex-memory/scripts/codex-memory-gate.mjs"),
+    path.join(root, "skills/chainseal/scripts/chainseal-gate.mjs"),
     ...args,
   ];
-  await import("../skills/clude-codex-memory/scripts/codex-memory-gate.mjs");
+  await import("../skills/chainseal/scripts/chainseal-gate.mjs");
 } else if (command === "canary") {
-  const script = path.join(root, "skills/clude-codex-memory/scripts/codex-memory-control-plane-canary.sh");
+  const script = path.join(root, "skills/chainseal/scripts/chainseal-canary.sh");
   const result = spawnSync(script, args.length ? args : [process.cwd()], {
     stdio: "inherit",
   });
