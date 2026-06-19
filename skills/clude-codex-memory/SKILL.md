@@ -9,6 +9,11 @@ description: Use when Clay asks to use, install, pilot, audit, configure, or rea
 
 Use Clude as a gated Codex memory pilot, not as a replacement for source truth. Prefer local-only MCP experiments until the hosted connector, credentials, and data boundary are explicitly approved.
 
+The stronger pattern is the Codex Memory Control Plane: a local source-truth,
+provenance, redaction, and review layer above Clude. Read
+`references/control-plane.md` when Clay asks how to make the Clude wrapper
+better than Clude alone.
+
 ## First Move
 
 1. Read the local pilot guide when available: `references/adoption-guide.md`.
@@ -39,6 +44,17 @@ Store only compact, source-backed, non-secret memories:
 
 Do not store secrets, env values, OAuth URLs, wallet/private-key material, raw transcripts, private customer data, provider logs, or unsupported claims.
 
+Before storing, updating, deleting, batch-ingesting, extracting, or promoting
+memories, run the local candidate gate when available:
+
+```bash
+node scripts/codex-memory-gate.mjs candidate.json
+```
+
+Allowed stores are still downstream of source truth. If the candidate belongs
+in repo docs, GoalBuddy, or Supermemory rather than Clude, route it there
+instead of forcing everything into Clude.
+
 ## Tool Boundaries
 
 - `recall_memories` and `get_memory_stats`: allowed for local read-only pilot checks.
@@ -52,6 +68,7 @@ Run the canary after wiring the pilot or changing this skill:
 
 ```bash
 scripts/clude-codex-canary.sh
+scripts/codex-memory-control-plane-canary.sh
 ```
 
 Report local, committed, pushed, and deployed/live status. Clude data lives outside the repo, so name that boundary when memory was written.
