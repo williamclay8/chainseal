@@ -24,6 +24,8 @@ Allowed candidate:
 
 - compact content;
 - verified source ref;
+- valid source line range when provided;
+- matching source hash when provided;
 - verified evidence status;
 - non-secret sensitivity.
 
@@ -35,6 +37,8 @@ Blocked candidates:
 - instruction-injection-shaped text;
 - obfuscated instruction-injection text;
 - missing source file.
+- invalid source line range;
+- source hash mismatch.
 
 Review-only candidates:
 
@@ -84,6 +88,9 @@ chainseal audit --ledger /tmp/chainseal-receipts.jsonl
 It flags:
 
 - missing source files;
+- possible moved-file matches;
+- source hash mismatches;
+- invalid source line ranges;
 - secret-like receipt content;
 - missing Lumi state.
 

@@ -1,0 +1,18 @@
+{
+  "action": "store",
+  "type": "semantic",
+  "content": "Chainseal can verify exact source line ranges before memory storage.",
+  "source_refs": [
+    {
+      "kind": "file",
+      "ref": "test/fixtures/source-refs/source-a.md",
+      "status": "verified",
+      "start_line": 2,
+      "end_line": 3
+    }
+  ],
+  "evidence": { "status": "verified" },
+  "sensitivity": "internal",
+  "target_store": "backend-local"
+}
+

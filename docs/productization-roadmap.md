@@ -106,8 +106,8 @@ Before hosted product:
 
 ## Immediate Next Builds
 
-1. Harden source verification with line refs, optional file hashes, and moved-file diagnostics.
-2. Add fixture-based false-positive and false-negative notes for real pilot workflows.
+1. Expand v0.3 source verification from line refs, optional file hashes, moved-file diagnostics, and fixtures into a full proof release.
+2. Add fixture-based false-positive and false-negative notes from real pilot workflows.
 3. Add one local backend adapter contract after the receipt ledger gets real use.
 4. Expand `chainseal audit` for contradictions, review-after dates, and source-stale conditions.
 5. Local MCP facade only after CLI behavior proves useful.

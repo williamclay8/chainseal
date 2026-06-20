@@ -146,6 +146,8 @@ For a compact repo entry packet, read [docs/repo-entry.md](docs/repo-entry.md). 
 
 For the v0.2.0 proof release, read [docs/releases/v0.2.0-proof-release.md](docs/releases/v0.2.0-proof-release.md). For the followable project spine, read [docs/project-spine.md](docs/project-spine.md).
 
+For launch copy and pilot asks, read [docs/launch/chainseal-v0.2-local-trust-loop-article.md](docs/launch/chainseal-v0.2-local-trust-loop-article.md), [docs/launch/manual-social-packet.md](docs/launch/manual-social-packet.md), and [docs/pilot-asks.md](docs/pilot-asks.md).
+
 ## Status
 
 MVP package published on npm as `chainseal`.
@@ -157,6 +159,8 @@ v0.2.0 positioning:
 ```text
 Chainseal now has a real local trust loop.
 ```
+
+v0.3 work has started on stronger source verification: line ranges, file hashes, moved-file diagnostics, and a fixture corpus.
 
 ## Community Boundary
 

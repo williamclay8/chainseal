@@ -65,7 +65,7 @@ write_json good.json '{
   "action": "store",
   "type": "semantic",
   "content": "Chainseal requires source-backed memories before storage.",
-  "source_refs": [{"kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified"}],
+  "source_refs": [{"kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified", "start_line": 1, "end_line": 3}],
   "evidence": {"status": "verified"},
   "sensitivity": "internal",
   "target_store": "backend-local",
@@ -149,6 +149,39 @@ write_json mutation.json '{
   "lumi": {"local": "clean"}
 }'
 
+write_json bad-line-range.json '{
+  "action": "store",
+  "type": "semantic",
+  "content": "This source reference points outside the source file.",
+  "source_refs": [{"kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified", "start_line": 99999}],
+  "evidence": {"status": "verified"},
+  "sensitivity": "internal",
+  "target_store": "backend-local",
+  "lumi": {"local": "clean"}
+}'
+
+write_json hash-mismatch.json '{
+  "action": "store",
+  "type": "semantic",
+  "content": "This source reference has a stale file hash.",
+  "source_refs": [{"kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified", "sha256": "0000000000000000000000000000000000000000000000000000000000000000"}],
+  "evidence": {"status": "verified"},
+  "sensitivity": "internal",
+  "target_store": "backend-local",
+  "lumi": {"local": "clean"}
+}'
+
+write_json moved-source.json '{
+  "action": "store",
+  "type": "semantic",
+  "content": "This source reference likely moved from the repo root into docs.",
+  "source_refs": [{"kind": "file", "ref": "repo-entry.md", "status": "verified"}],
+  "evidence": {"status": "verified"},
+  "sensitivity": "internal",
+  "target_store": "backend-local",
+  "lumi": {"local": "clean"}
+}'
+
 expect_status good.json 0 "source-backed compact memory is allowed"
 expect_status fake-secret.json 1 "secret-like memory is blocked"
 expect_status raw-transcript.json 1 "raw transcript-shaped memory is blocked"
@@ -156,6 +189,15 @@ expect_status unsupported.json 1 "unsupported source-free memory is blocked"
 expect_status injection.json 1 "instruction-injection memory is blocked"
 expect_status obfuscated-injection.json 1 "obfuscated instruction-injection memory is blocked"
 expect_status missing-source.json 1 "missing source file is blocked"
+expect_status bad-line-range.json 1 "source line range outside file is blocked"
+expect_status hash-mismatch.json 1 "source hash mismatch is blocked"
+expect_status moved-source.json 1 "missing source gives moved-file diagnostic"
+if grep -q '"docs/repo-entry.md"' "$TMPDIR/moved-source.json.out"; then
+  pass "moved-file diagnostic includes possible matches"
+else
+  bad "moved-file diagnostic includes possible matches"
+  cat "$TMPDIR/moved-source.json.out" || true
+fi
 expect_status mutation.json 2 "mutation action requires review"
 
 set +e

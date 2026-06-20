@@ -1,6 +1,6 @@
 {
   "name": "chainseal",
-  "version": "0.2.0",
+  "version": "0.3.0-alpha.0",
   "description": "Source-backed memory firewall and trust boundary for coding agents.",
   "type": "module",
   "exports": {
@@ -18,6 +18,9 @@
     "lib/",
     "schemas/",
     "docs/chainseal-architecture.md",
+    "docs/content-rhythm.md",
+    "docs/launch/",
+    "docs/pilot-asks.md",
     "docs/pilot-workflows.md",
     "docs/proof-playbook.md",
     "docs/productization-roadmap.md",
@@ -25,6 +28,7 @@
     "docs/releases/v0.2.0-proof-release.md",
     "docs/repo-entry.md",
     "docs/threat-model.md",
+    "docs/v0.3/",
     "skills/chainseal/SKILL.md",
     "skills/chainseal/agents/openai.yaml",
     "skills/chainseal/references/control-plane.md",

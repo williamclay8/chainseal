@@ -33,6 +33,8 @@ Proof target:
 
 ### v0.3: Stronger Source Verification
 
+Status: in progress.
+
 Scope:
 
 - line-number source refs;
@@ -130,4 +132,3 @@ The proof is:
 - security policy;
 - repeatable release artifacts;
 - disciplined local/committed/pushed/live tracking.
-

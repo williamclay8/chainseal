@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -8,12 +9,15 @@ import {
   auditReceipts,
   createReceipt,
   decide,
+  inspectSourceRefs,
   loadReceipts,
   recallPacket,
   storeCandidate,
 } from "../lib/chainseal.js";
 
 const repoRoot = path.resolve(".");
+const sourceFixtureRef = "test/fixtures/source-refs/source-a.md";
+const sourceFixturePath = path.join(repoRoot, sourceFixtureRef);
 
 function candidate(overrides = {}) {
   return {
@@ -59,6 +63,153 @@ test("decide blocks obfuscated instruction-injection shaped memories", () => {
 
   assert.equal(result.ok, false);
   assert.match(result.reasons.join("\n"), /instruction-injection/);
+});
+
+test("inspectSourceRefs verifies line ranges for file source refs", () => {
+  const result = inspectSourceRefs([
+    {
+      kind: "file",
+      ref: "test/fixtures/source-refs/source-a.md",
+      status: "verified",
+      start_line: 2,
+      end_line: 3,
+    },
+  ], { projectRoot: repoRoot });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.verified[0].line_span.start_line, 2);
+  assert.equal(result.verified[0].line_span.end_line, 3);
+
+  const blocked = inspectSourceRefs([
+    {
+      kind: "file",
+      ref: "test/fixtures/source-refs/source-a.md",
+      status: "verified",
+      start_line: 99,
+    },
+  ], { projectRoot: repoRoot });
+
+  assert.equal(blocked.ok, false);
+  assert.match(blocked.reasons.join("\n"), /line range outside file/);
+});
+
+test("inspectSourceRefs rejects malformed or incomplete line ranges", () => {
+  const cases = [
+    {
+      name: "line zero",
+      sourceRef: { line: 0 },
+      reason: /line range must use positive integers/,
+    },
+    {
+      name: "non-integer line",
+      sourceRef: { line: 1.5 },
+      reason: /line range must use positive integers/,
+    },
+    {
+      name: "end before start",
+      sourceRef: { start_line: 3, end_line: 2 },
+      reason: /line range end precedes start/,
+    },
+    {
+      name: "end without start",
+      sourceRef: { end_line: 2 },
+      reason: /line range requires line or start_line when end_line is set/,
+    },
+  ];
+
+  for (const testCase of cases) {
+    const result = inspectSourceRefs([
+      {
+        kind: "file",
+        ref: sourceFixtureRef,
+        status: "verified",
+        ...testCase.sourceRef,
+      },
+    ], { projectRoot: repoRoot });
+
+    assert.equal(result.ok, false, testCase.name);
+    assert.match(result.reasons.join("\n"), testCase.reason, testCase.name);
+    assert.equal(result.diagnostics[0].kind, "line_range_invalid", testCase.name);
+  }
+});
+
+test("inspectSourceRefs reports expected and actual hashes on sha256 mismatch", () => {
+  const actualSha256 = crypto
+    .createHash("sha256")
+    .update(fs.readFileSync(sourceFixturePath))
+    .digest("hex");
+
+  const result = inspectSourceRefs([
+    {
+      kind: "file",
+      ref: sourceFixtureRef,
+      status: "verified",
+      sha256: "0000000000000000000000000000000000000000000000000000000000000000",
+    },
+  ], { projectRoot: repoRoot });
+
+  assert.equal(result.ok, false);
+  assert.match(result.reasons.join("\n"), /sha256 mismatch/);
+  assert.deepEqual(result.diagnostics[0], {
+    kind: "sha256_mismatch",
+    ref: sourceFixtureRef,
+    expected_sha256: "0000000000000000000000000000000000000000000000000000000000000000",
+    actual_sha256: actualSha256,
+  });
+});
+
+test("inspectSourceRefs suggests likely moved files when a source path is missing", () => {
+  const result = inspectSourceRefs([
+    {
+      kind: "file",
+      ref: "docs/source-a.md",
+      status: "verified",
+    },
+  ], { projectRoot: repoRoot });
+
+  assert.equal(result.ok, false);
+  assert.match(result.reasons.join("\n"), /source_ref file does not exist/);
+  assert.deepEqual(result.diagnostics[0].possible_matches, [
+    "test/fixtures/source-refs/source-a.md",
+  ]);
+});
+
+test("source-ref fixture corpus exercises safe, poisoned, stale, and secret-like candidates", () => {
+  const cases = [
+    {
+      file: "safe-memory.json",
+      ok: true,
+      reason: null,
+    },
+    {
+      file: "poisoned-memory.json",
+      ok: false,
+      reason: /instruction-injection/,
+    },
+    {
+      file: "stale-memory.json",
+      ok: false,
+      reason: /possible matches: test\/fixtures\/source-refs\/source-a.md/,
+    },
+    {
+      file: "secret-like-memory.json",
+      ok: false,
+      reason: /secret-like pattern/,
+    },
+  ];
+
+  for (const testCase of cases) {
+    const body = fs.readFileSync(
+      path.join(repoRoot, "test/fixtures/source-refs", testCase.file),
+      "utf8",
+    );
+    const result = decide(JSON.parse(body), { projectRoot: repoRoot });
+
+    assert.equal(result.ok, testCase.ok, testCase.file);
+    if (testCase.reason) {
+      assert.match(result.reasons.join("\n"), testCase.reason, testCase.file);
+    }
+  }
 });
 
 test("createReceipt records the gate decision, source refs, validity, and Lumi state", () => {

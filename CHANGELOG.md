@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0-alpha.0 - 2026-06-20
+
+- Added source-ref line range validation with `line`, `start_line`, and `end_line`.
+- Added structured source diagnostics for hash mismatches and likely moved files.
+- Added a fixture corpus for safe, poisoned, stale, and secret-like memory candidates.
+- Expanded canaries for invalid line ranges, stale hashes, and moved-file diagnostics.
+- Added launch article, manual social packet, pilot asks, content rhythm, and the v0.3 proof target.
+
 ## 0.2.0 - 2026-06-20
 
 - Added a reusable Chainseal library API for candidate decisions, source-ref checks, receipt creation, ledger storage, audit, and recall packets.
