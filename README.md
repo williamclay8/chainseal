@@ -27,16 +27,16 @@ npm install
 npm test
 ```
 
-After publishing:
+From npm:
 
 ```bash
-npx chainseal gate candidate.json
+npm install chainseal
 ```
 
 or:
 
 ```bash
-npx -p chainseal chainseal-gate candidate.json
+npx chainseal --help
 ```
 
 ## CLI
@@ -115,4 +115,4 @@ Read [SECURITY.md](SECURITY.md) before connecting Chainseal to hosted memory bac
 
 ## Status
 
-MVP local package. Not published yet.
+MVP package published on npm as `chainseal`.

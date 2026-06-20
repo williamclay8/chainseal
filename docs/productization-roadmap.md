@@ -74,16 +74,19 @@ No hosted service is required for the MVP.
 
 ## Distribution Checklist
 
-Before public npm publish:
+Completed for public npm publish:
 
 - Keep the package name, CLI, docs, and skill pack branded as Chainseal.
 - Use descriptive compatibility copy instead of third-party product marks in the package name.
 - Add repository URL after the remote exists.
-- Add public issue/security contact before accepting external reports.
 - Run `npm test`.
 - Run `npm run pack:dry` and inspect tarball contents.
 - Run disposable-directory install test from the generated tarball.
 - Confirm package/version availability.
+
+Before broader public support:
+
+- Add public issue/security contact before accepting external reports.
 
 Before hosted product:
 

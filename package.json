@@ -1,6 +1,6 @@
 {
   "name": "chainseal",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Source-backed memory firewall and trust boundary for coding agents.",
   "type": "module",
   "bin": {
