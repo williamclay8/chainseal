@@ -1,0 +1,16 @@
+{
+  "action": "store",
+  "type": "semantic",
+  "content": "This memory points at a source path that moved.",
+  "source_refs": [
+    {
+      "kind": "file",
+      "ref": "docs/source-a.md",
+      "status": "verified"
+    }
+  ],
+  "evidence": { "status": "verified" },
+  "sensitivity": "internal",
+  "target_store": "backend-local"
+}
+

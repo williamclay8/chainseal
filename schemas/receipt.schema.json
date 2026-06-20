@@ -25,6 +25,7 @@
       "enum": ["episodic", "semantic", "procedural", "self_model", "introspective"]
     },
     "scope": { "type": "string" },
+    "fact_key": { "type": ["string", "null"] },
     "content": { "type": "string" },
     "source_refs": {
       "type": "array",

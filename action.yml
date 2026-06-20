@@ -1,0 +1,13 @@
+name: Chainseal Proof Gate
+description: Run Chainseal local proof checks in a repository.
+inputs:
+  project:
+    description: Project root to check.
+    required: false
+    default: "."
+runs:
+  using: composite
+  steps:
+    - name: Run Chainseal canary
+      shell: bash
+      run: node "${{ github.action_path }}/bin/chainseal.mjs" canary "${{ inputs.project }}"

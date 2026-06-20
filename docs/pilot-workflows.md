@@ -47,6 +47,7 @@ For every pilot, capture:
 - false negatives;
 - confusing CLI or docs language;
 - missing source-ref needs;
+- line-range or file-hash friction;
 - whether receipt output helped;
 - whether recall felt like a lead instead of proof.
 
@@ -54,11 +55,12 @@ For every pilot, capture:
 
 1. Run the canary suite.
 2. Gate a safe candidate with a real source file.
-3. Gate a source-free or prompt-injection-shaped candidate.
-4. Store the safe candidate into an explicit local ledger.
-5. Recall from the ledger.
-6. Audit the ledger.
-7. Record the friction and missing checks.
+3. Gate a safe candidate with a line range.
+4. Gate a source-free, stale-hash, bad-line-range, or prompt-injection-shaped candidate.
+5. Store the safe candidate into an explicit local ledger.
+6. Recall from the ledger.
+7. Audit the ledger.
+8. Record the friction and missing checks.
 
 ## Exit Criteria
 
@@ -70,4 +72,3 @@ A pilot is useful when it produces at least one of:
 - a docs confusion to fix;
 - a source-ref problem to support;
 - a clearer adapter-contract requirement.
-

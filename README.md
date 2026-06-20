@@ -78,6 +78,20 @@ Print the candidate or receipt schema:
 ```bash
 chainseal schema candidate
 chainseal schema receipt
+chainseal schema adapter-contract
+```
+
+Inspect the backend-neutral adapter contract:
+
+```bash
+chainseal adapter-contract
+```
+
+Inspect the local MCP facade descriptor:
+
+```bash
+chainseal mcp-descriptor
+chainseal-mcp descriptor
 ```
 
 Run the canary suite:
@@ -122,15 +136,28 @@ The first distributable product is a local CLI and skill pack:
 - `chainseal-canary`: replayable safety checks.
 - `skills/chainseal`: portable agent workflow wrapper and references.
 - `docs/chainseal-architecture.md`: architecture and roadmap.
+- `action.yml`: composite repo proof gate.
 
-The next product step is a local MCP facade exposing:
+The local MCP facade exposes:
 
 - `chainseal_propose_store`
 - `chainseal_recall_packet`
 - `chainseal_audit`
 - `chainseal_receipt`
 
-The MCP facade stays behind the CLI proof gate. Chainseal should prove the local schema, ledger, store, recall, and audit workflow before it exposes tool endpoints to agent runtimes.
+The MCP facade stays behind the same local proof gate as the CLI. It is a local stdio JSON-RPC surface, not a hosted memory service.
+
+## GitHub Action
+
+Use the composite proof gate from this repository to make Chainseal enforceable in another repo:
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - uses: williamclay8/chainseal@v0.3.0
+```
+
+The Action runs the Chainseal canary against the checked-out project.
 
 ## Backend Adapters
 
@@ -144,7 +171,13 @@ Read [SECURITY.md](SECURITY.md) before connecting Chainseal to hosted memory bac
 
 For a compact repo entry packet, read [docs/repo-entry.md](docs/repo-entry.md). For the current threat model, read [docs/threat-model.md](docs/threat-model.md). For reproducible proof commands and expected outputs, read [docs/proof-playbook.md](docs/proof-playbook.md).
 
-For the v0.2.0 proof release, read [docs/releases/v0.2.0-proof-release.md](docs/releases/v0.2.0-proof-release.md). For the followable project spine, read [docs/project-spine.md](docs/project-spine.md).
+For proof releases, read [docs/releases/v0.2.0-proof-release.md](docs/releases/v0.2.0-proof-release.md) and [docs/releases/v0.3.0-proof-release.md](docs/releases/v0.3.0-proof-release.md). For the followable project spine, read [docs/project-spine.md](docs/project-spine.md).
+
+For the current build surfaces, read [docs/v0.4/adapter-contract.md](docs/v0.4/adapter-contract.md), [docs/v0.5/recall-broker-hardening.md](docs/v0.5/recall-broker-hardening.md), and [docs/v0.6/local-mcp-facade.md](docs/v0.6/local-mcp-facade.md).
+
+For evidence capture, read [docs/pilots/README.md](docs/pilots/README.md). Pilot reports should show real commands, outputs, limitations, and operator notes.
+
+For launch copy and pilot asks, read [docs/launch/chainseal-v0.2-local-trust-loop-article.md](docs/launch/chainseal-v0.2-local-trust-loop-article.md), [docs/launch/manual-social-packet.md](docs/launch/manual-social-packet.md), and [docs/pilot-asks.md](docs/pilot-asks.md).
 
 ## Status
 
@@ -157,6 +190,14 @@ v0.2.0 positioning:
 ```text
 Chainseal now has a real local trust loop.
 ```
+
+v0.3.0 proof release:
+
+```text
+Chainseal now verifies stronger source claims before memory crosses the line.
+```
+
+The current package includes stronger source verification, a backend-neutral adapter contract, recall broker hardening, a local MCP facade, and GitHub Action proof surfaces. Backend adapters and hosted services remain out of scope until real pilots prove the contract.
 
 ## Community Boundary
 

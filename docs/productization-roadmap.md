@@ -35,7 +35,9 @@ Phase 1 ships as an npm CLI and skill pack:
 - `chainseal store candidate.json --ledger <receipts.jsonl>`
 - `chainseal recall "query" --ledger <receipts.jsonl>`
 - `chainseal audit --ledger <receipts.jsonl>`
-- `chainseal schema candidate|receipt`
+- `chainseal schema candidate|receipt|adapter-contract`
+- `chainseal adapter-contract`
+- `chainseal mcp-descriptor`
 - `chainseal canary /path/to/repo`
 - source-backed memory candidate schema;
 - local append-only receipt schema;
@@ -106,11 +108,11 @@ Before hosted product:
 
 ## Immediate Next Builds
 
-1. Harden source verification with line refs, optional file hashes, and moved-file diagnostics.
-2. Add fixture-based false-positive and false-negative notes for real pilot workflows.
-3. Add one local backend adapter contract after the receipt ledger gets real use.
-4. Expand `chainseal audit` for contradictions, review-after dates, and source-stale conditions.
-5. Local MCP facade only after CLI behavior proves useful.
+1. Run three to five real pilot workflows and capture false positives, blocked examples, missing checks, and operator notes.
+2. Add a contract compatibility harness before writing backend-specific adapters.
+3. Expand audit for package, deploy, branch, and provider-state stale facts.
+4. Add local MCP client examples without mutating global config.
+5. Add richer fixture coverage for safe, poisoned, stale, contradictory, and secret-like memories.
 
 ## Launch Copy
 

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chainseal.dev/schemas/adapter-contract.schema.json",
+  "title": "Chainseal Adapter Contract Packet",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["ok", "contract", "operation", "fail_closed", "gate", "receipt", "backend_request"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "contract": {
+      "type": "object",
+      "required": ["version", "posture", "backend_neutral"],
+      "properties": {
+        "version": { "type": "string", "const": "chainseal.adapter.v1" },
+        "posture": { "type": "string", "const": "fail_closed" },
+        "backend_neutral": { "type": "boolean", "const": true }
+      }
+    },
+    "operation": { "type": "string", "enum": ["memory.write", "memory.recall", "memory.audit"] },
+    "fail_closed": { "type": "boolean" },
+    "gate": { "type": "object" },
+    "receipt": { "type": ["object", "null"] },
+    "backend_request": { "type": ["object", "null"] }
+  }
+}
+

@@ -29,6 +29,10 @@
     "query": {
       "type": "string"
     },
+    "fact_key": {
+      "type": "string",
+      "description": "Stable key for one fact family, used by audit and recall to surface contradictory receipts."
+    },
     "source_refs": {
       "type": "array",
       "items": {
@@ -51,6 +55,18 @@
           "sha256": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "start_line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "end_line": {
+            "type": "integer",
+            "minimum": 1
           }
         }
       }

@@ -42,6 +42,8 @@ Validate one candidate:
 chainseal gate candidate.json --project .
 ```
 
+File source refs may include `line`, `start_line`, `end_line`, and `sha256`. Chainseal verifies that the file exists, the optional line range is inside the file, and the optional hash matches the current file contents.
+
 Store one allowed candidate with an explicit ledger:
 
 ```bash
@@ -58,6 +60,15 @@ Audit a local ledger:
 
 ```bash
 chainseal audit --ledger /tmp/chainseal-receipts.jsonl --project .
+```
+
+Inspect the adapter contract and local MCP facade:
+
+```bash
+chainseal schema adapter-contract
+chainseal adapter-contract
+chainseal mcp-descriptor
+chainseal-mcp descriptor
 ```
 
 ## Stronger Check
@@ -93,4 +104,3 @@ If code, docs, release assets, or package metadata change, explicitly track:
 - deployed/live state.
 
 Never revert or discard dirty changes unless the user explicitly asks.
-

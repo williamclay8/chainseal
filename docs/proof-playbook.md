@@ -24,6 +24,8 @@ Allowed candidate:
 
 - compact content;
 - verified source ref;
+- valid source line range when provided;
+- matching source hash when provided;
 - verified evidence status;
 - non-secret sensitivity.
 
@@ -34,7 +36,9 @@ Blocked candidates:
 - unsupported/source-free claim;
 - instruction-injection-shaped text;
 - obfuscated instruction-injection text;
-- missing source file.
+- missing source file;
+- invalid source line range;
+- source hash mismatch.
 
 Review-only candidates:
 
@@ -84,8 +88,36 @@ chainseal audit --ledger /tmp/chainseal-receipts.jsonl
 It flags:
 
 - missing source files;
+- possible moved-file matches;
+- source hash mismatches;
+- invalid source line ranges;
 - secret-like receipt content;
-- missing Lumi state.
+- missing Lumi state;
+- review-after dates that have passed;
+- expired or invalidated receipt validity;
+- contradictory receipts sharing a `fact_key`.
+
+## Adapter Contract Proof
+
+Inspect the backend-neutral contract:
+
+```bash
+chainseal schema adapter-contract
+chainseal adapter-contract
+```
+
+The contract is fail-closed: backend adapters should only write when the returned packet has `ok: true` and a non-null `backend_request`.
+
+## Local MCP Proof
+
+Inspect the local facade:
+
+```bash
+chainseal mcp-descriptor
+chainseal-mcp descriptor
+```
+
+The facade is local stdio JSON-RPC. It exposes propose-store, recall-packet, audit, receipt preview, and schema-name tools. It does not expose broad mutation tools.
 
 ## Package Proof
 

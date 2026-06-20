@@ -1,4 +1,4 @@
-name: CI
+name: Chainseal Proof
 
 on:
   pull_request:
@@ -10,17 +10,17 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  proof:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.x
       - run: npm install
       - run: npm test
       - run: npm run pack:dry
+      - run: node bin/chainseal-mcp.mjs descriptor
+      - run: git diff --check
+      - name: Run Chainseal composite proof gate
+        uses: ./
