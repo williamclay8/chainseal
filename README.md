@@ -142,13 +142,21 @@ Use backend recall as a lead. Verify against repo files, tests, git, CI, provide
 
 Read [SECURITY.md](SECURITY.md) before connecting Chainseal to hosted memory backends, remote MCP endpoints, vector databases, wallets, provider logs, or secret-bearing workflows.
 
-For the current threat model, read [docs/threat-model.md](docs/threat-model.md). For reproducible proof commands and expected outputs, read [docs/proof-playbook.md](docs/proof-playbook.md).
+For a compact repo entry packet, read [docs/repo-entry.md](docs/repo-entry.md). For the current threat model, read [docs/threat-model.md](docs/threat-model.md). For reproducible proof commands and expected outputs, read [docs/proof-playbook.md](docs/proof-playbook.md).
+
+For the v0.2.0 proof release, read [docs/releases/v0.2.0-proof-release.md](docs/releases/v0.2.0-proof-release.md). For the followable project spine, read [docs/project-spine.md](docs/project-spine.md).
 
 ## Status
 
 MVP package published on npm as `chainseal`.
 
 Current build direction: keep Chainseal local-first, deterministic, source-backed, and backend-neutral. The near-term project is not a hosted memory service. It is the gate, receipt ledger, recall packet, and audit layer that makes existing memory systems safer to use.
+
+v0.2.0 positioning:
+
+```text
+Chainseal now has a real local trust loop.
+```
 
 ## Community Boundary
 
