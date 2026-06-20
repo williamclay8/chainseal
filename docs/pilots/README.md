@@ -27,6 +27,9 @@ Each report should include:
 ## Current Reports
 
 - [000 Chainseal Self-Hosted Proof](000-chainseal-self-hosted-proof.md): internal repo proof loop for this release branch.
+- [001 Source-Backed Write](001-source-backed-write.md): internal workflow proving explicit-ledger storage after source verification.
+- [002 Adapter Harness Block](002-adapter-harness-block.md): internal workflow proving blocked candidates do not produce backend write requests.
+- [003 Recall Review Loop](003-recall-review-loop.md): internal workflow proving recall and audit surface review-due contradictions.
 
 External pilot slots are intentionally empty until real users run them.
 

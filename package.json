@@ -1,6 +1,6 @@
 {
   "name": "chainseal",
-  "version": "0.3.0",
+  "version": "0.4.0-alpha.0",
   "description": "Source-backed memory firewall and trust boundary for coding agents.",
   "type": "module",
   "exports": {
@@ -18,6 +18,7 @@
   "files": [
     "bin/",
     "action.yml",
+    "examples/",
     "lib/",
     "schemas/",
     "docs/chainseal-architecture.md",
@@ -48,7 +49,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "check": "node --check lib/chainseal.js && node --check bin/chainseal.mjs && node --check bin/chainseal-mcp.mjs && node --check skills/chainseal/scripts/chainseal-gate.mjs && bash -n skills/chainseal/scripts/chainseal-canary.sh",
+    "check": "node --check lib/chainseal.js && node --check bin/chainseal.mjs && node --check bin/chainseal-mcp.mjs && node --check examples/mcp-local-client.mjs && node --check skills/chainseal/scripts/chainseal-gate.mjs && bash -n skills/chainseal/scripts/chainseal-canary.sh",
     "test": "npm run check && node --test && skills/chainseal/scripts/chainseal-canary.sh .",
     "pack:dry": "npm pack --dry-run"
   },

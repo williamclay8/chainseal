@@ -31,7 +31,7 @@ chainseal adapter-contract
 Library API:
 
 ```js
-import { adapterContract, adapterWritePacket } from "chainseal";
+import { adapterContract, adapterContractHarness, adapterWritePacket } from "chainseal";
 ```
 
 ## Write Packet
@@ -72,18 +72,63 @@ The test suite proves:
 
 - allowed candidates produce backend write packets;
 - blocked candidates fail closed with `backend_request: null`;
-- receipts carry `fact_key` for downstream audit and recall checks.
+- receipts carry `fact_key` for downstream audit and recall checks;
+- the adapter harness calls a backend writer only for allowed packets.
 
 The canary proves:
 
 ```text
 PASS: adapter contract schema is exposed
 PASS: adapter contract is backend-neutral and versioned
+PASS: adapter harness proves fail-closed cases
 ```
+
+## Harness
+
+Run fixture cases:
+
+```bash
+chainseal adapter-harness adapter-cases.json --project .
+```
+
+Fixture shape:
+
+```json
+{
+  "cases": [
+    {
+      "name": "source-backed allow",
+      "expect": "allow",
+      "candidate": {
+        "action": "store",
+        "type": "semantic",
+        "content": "Compact sourced fact.",
+        "source_refs": [
+          { "kind": "file", "ref": "docs/source.md", "status": "verified" }
+        ],
+        "evidence": { "status": "verified" },
+        "sensitivity": "internal",
+        "target_store": "backend-local"
+      }
+    }
+  ]
+}
+```
+
+Library harness:
+
+```js
+const report = await adapterContractHarness(cases, {
+  projectRoot: process.cwd(),
+  write: async (packet) => adapter.write(packet.backend_request)
+});
+```
+
+The harness never calls `write` for blocked packets.
 
 ## Next Work
 
-- Add adapter-contract examples for common local-only memory flows.
-- Add a contract compatibility test harness.
+- Expand adapter-contract examples for common local-only memory flows.
+- Add adapter error and retry compatibility cases.
 - Add backend error mapping without provider-specific code.
 - Keep all backend credential and hosted surfaces outside the core package until reviewed.

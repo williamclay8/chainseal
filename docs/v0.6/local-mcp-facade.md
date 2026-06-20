@@ -22,6 +22,12 @@ Direct binary:
 chainseal-mcp descriptor
 ```
 
+Client example:
+
+```bash
+node examples/mcp-local-client.mjs
+```
+
 Runtime version:
 
 ```text
@@ -78,6 +84,17 @@ PASS: local MCP descriptor exposes propose-store
 PASS: local MCP propose-store fails closed
 ```
 
+The local client example prints:
+
+```json
+{
+  "method": "chainseal_propose_store",
+  "ok": false,
+  "backend_request": null,
+  "reasons": ["content matches secret-like pattern"]
+}
+```
+
 ## Known Limits
 
 - This is a local facade, not a remote server.
@@ -87,7 +104,7 @@ PASS: local MCP propose-store fails closed
 
 ## Next Work
 
-- Add a documented local client example.
+- Expand documented local client examples for recall and audit.
 - Add descriptor drift checks to CI.
 - Add per-tool input examples.
 - Add governance docs before any global MCP config mutation.

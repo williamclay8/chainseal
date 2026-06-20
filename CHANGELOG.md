@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0-alpha.0 - Unreleased
+
+- Added `adapterContractHarness()` for fixture-based adapter contract checks.
+- Added `chainseal adapter-harness <cases.json>` to prove allowed and blocked write cases from JSON fixtures.
+- Added `examples/mcp-local-client.mjs` as a local stdio JSON-RPC client example.
+- Expanded canaries for adapter harness proof.
+- Added three internal pilot workflow reports with command evidence and limitations.
+
 ## 0.3.0 - 2026-06-20
 
 - Added source-ref line range validation with `line`, `start_line`, and `end_line`.

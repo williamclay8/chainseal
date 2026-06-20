@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
@@ -7,6 +8,7 @@ import test from "node:test";
 
 import {
   adapterContract,
+  adapterContractHarness,
   adapterWritePacket,
   auditReceipts,
   createReceipt,
@@ -275,6 +277,88 @@ test("adapterWritePacket creates a fail-closed backend-neutral write contract", 
   assert.equal(blocked.receipt, null);
 });
 
+test("adapterContractHarness proves blocked candidates never reach a backend writer", async () => {
+  const writes = [];
+  const report = await adapterContractHarness([
+    {
+      name: "allowed source-backed write",
+      candidate: candidate({ fact_key: "harness.allowed" }),
+      expect: "allow",
+    },
+    {
+      name: "blocked secret-shaped write",
+      candidate: candidate({
+        content: "SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET",
+        fact_key: "harness.blocked",
+      }),
+      expect: "block",
+    },
+  ], {
+    projectRoot: repoRoot,
+    write: async (packet) => {
+      writes.push(packet.backend_request);
+      return { stored: true, id: packet.receipt.id };
+    },
+  });
+
+  assert.equal(report.ok, true);
+  assert.equal(report.contract.version, adapterContract().version);
+  assert.equal(report.cases.length, 2);
+  assert.equal(writes.length, 1);
+  assert.equal(report.cases[0].adapter_result.stored, true);
+  assert.equal(report.cases[1].packet.backend_request, null);
+});
+
+test("adapterContractHarness reports expectation mismatches without writing", async () => {
+  const report = await adapterContractHarness([
+    {
+      name: "expected allow but blocked",
+      candidate: candidate({
+        content: "SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET",
+      }),
+      expect: "allow",
+    },
+  ], { projectRoot: repoRoot });
+
+  assert.equal(report.ok, false);
+  assert.match(report.cases[0].violations.join("\n"), /expected allow but got block/);
+});
+
+test("CLI adapter-harness checks fixture cases", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "chainseal-harness-"));
+  const casesFile = path.join(dir, "adapter-cases.json");
+  fs.writeFileSync(casesFile, `${JSON.stringify({
+    cases: [
+      {
+        name: "allow",
+        expect: "allow",
+        candidate: candidate({ fact_key: "cli.allow" }),
+      },
+      {
+        name: "block",
+        expect: "block",
+        candidate: candidate({
+          content: "SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET",
+          fact_key: "cli.block",
+        }),
+      },
+    ],
+  })}\n`);
+
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, "bin/chainseal.mjs"),
+    "adapter-harness",
+    casesFile,
+    "--project",
+    repoRoot,
+  ], { encoding: "utf8" });
+
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.ok, true);
+  assert.equal(report.cases.length, 2);
+});
+
 test("auditReceipts flags stale source refs and secret-like receipt content", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "chainseal-audit-"));
   const ledger = path.join(dir, "receipts.jsonl");
@@ -404,6 +488,18 @@ test("local MCP facade exposes descriptor and fail-closed propose_store handler"
   }, { projectRoot: repoRoot });
 
   assert.equal(unknown.error.code, -32601);
+});
+
+test("local MCP client example demonstrates fail-closed propose-store", () => {
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, "examples/mcp-local-client.mjs"),
+  ], { cwd: repoRoot, encoding: "utf8" });
+
+  assert.equal(result.status, 0, result.stderr);
+  const proof = JSON.parse(result.stdout);
+  assert.equal(proof.method, "chainseal_propose_store");
+  assert.equal(proof.ok, false);
+  assert.equal(proof.backend_request, null);
 });
 
 test("repo exposes GitHub Action proof surfaces", () => {
