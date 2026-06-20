@@ -87,11 +87,23 @@ Inspect the backend-neutral adapter contract:
 chainseal adapter-contract
 ```
 
+Run adapter contract cases from a fixture file:
+
+```bash
+chainseal adapter-harness adapter-cases.json --project .
+```
+
 Inspect the local MCP facade descriptor:
 
 ```bash
 chainseal mcp-descriptor
 chainseal-mcp descriptor
+```
+
+Run the local MCP client example:
+
+```bash
+node examples/mcp-local-client.mjs
 ```
 
 Run the canary suite:

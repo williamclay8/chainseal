@@ -104,6 +104,7 @@ Inspect the backend-neutral contract:
 ```bash
 chainseal schema adapter-contract
 chainseal adapter-contract
+chainseal adapter-harness adapter-cases.json --project .
 ```
 
 The contract is fail-closed: backend adapters should only write when the returned packet has `ok: true` and a non-null `backend_request`.
@@ -115,6 +116,7 @@ Inspect the local facade:
 ```bash
 chainseal mcp-descriptor
 chainseal-mcp descriptor
+node examples/mcp-local-client.mjs
 ```
 
 The facade is local stdio JSON-RPC. It exposes propose-store, recall-packet, audit, receipt preview, and schema-name tools. It does not expose broad mutation tools.

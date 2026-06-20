@@ -305,6 +305,51 @@ else
   cat "$TMPDIR/adapter-contract.err" || true
 fi
 
+write_json adapter-cases.json '{
+  "cases": [
+    {
+      "name": "source-backed allow",
+      "expect": "allow",
+      "candidate": {
+        "action": "store",
+        "type": "semantic",
+        "content": "Chainseal requires source-backed memories before storage.",
+        "source_refs": [{"kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified"}],
+        "evidence": {"status": "verified"},
+        "sensitivity": "internal",
+        "target_store": "backend-local",
+        "lumi": {"local": "clean"}
+      }
+    },
+    {
+      "name": "secret-shaped block",
+      "expect": "block",
+      "candidate": {
+        "action": "store",
+        "type": "semantic",
+        "content": "SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET",
+        "source_refs": [{"kind": "file", "ref": "docs/chainseal-architecture.md", "status": "verified"}],
+        "evidence": {"status": "verified"},
+        "sensitivity": "internal",
+        "target_store": "backend-local",
+        "lumi": {"local": "clean"}
+      }
+    }
+  ]
+}'
+
+set +e
+node "$CHAINSEAL" adapter-harness "$TMPDIR/adapter-cases.json" --project "$SOURCE_ROOT" > "$TMPDIR/adapter-harness.out" 2> "$TMPDIR/adapter-harness.err"
+adapter_harness_status=$?
+set -e
+if [ "$adapter_harness_status" = "0" ] && grep -q '"ok": true' "$TMPDIR/adapter-harness.out"; then
+  pass "adapter harness proves fail-closed cases"
+else
+  bad "adapter harness proves fail-closed cases"
+  cat "$TMPDIR/adapter-harness.out" || true
+  cat "$TMPDIR/adapter-harness.err" || true
+fi
+
 printf '%s\n%s\n' \
 '{"id":"canary-review-due","created_at":"2026-05-01T00:00:00.000Z","type":"semantic","scope":"project","fact_key":"chainseal.release_surface","content":"Chainseal release surface is npm only.","source_refs":[{"kind":"file","ref":"docs/chainseal-architecture.md","status":"verified"}],"evidence":{"status":"verified"},"validity":{"valid_from":"2026-05-01","valid_until":null,"invalidated_by":[]},"sensitivity":"internal","trust_tier":"source_backed","stores":["backend-local"],"expires_or_review_after":"2026-06-01","gate":{"decision":"allow","reasons":[],"warnings":[]},"lumi":{"local":"clean"}}' \
 '{"id":"canary-current","created_at":"2026-06-20T00:00:00.000Z","type":"semantic","scope":"project","fact_key":"chainseal.release_surface","content":"Chainseal release surface is GitHub and npm.","source_refs":[{"kind":"file","ref":"docs/chainseal-architecture.md","status":"verified"}],"evidence":{"status":"verified"},"validity":{"valid_from":"2026-06-20","valid_until":null,"invalidated_by":[]},"sensitivity":"internal","trust_tier":"source_backed","stores":["backend-local"],"expires_or_review_after":"2099-01-01","gate":{"decision":"allow","reasons":[],"warnings":[]},"lumi":{"local":"clean"}}' \

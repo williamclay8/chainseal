@@ -67,8 +67,10 @@ Inspect the adapter contract and local MCP facade:
 ```bash
 chainseal schema adapter-contract
 chainseal adapter-contract
+chainseal adapter-harness adapter-cases.json --project .
 chainseal mcp-descriptor
 chainseal-mcp descriptor
+node examples/mcp-local-client.mjs
 ```
 
 ## Stronger Check

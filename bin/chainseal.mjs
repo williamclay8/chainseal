@@ -7,6 +7,7 @@ import path from "node:path";
 import {
   auditReceipts,
   adapterContract,
+  adapterContractHarness,
   decide,
   mcpDescriptor,
   readCandidate,
@@ -25,6 +26,7 @@ function usage() {
   chainseal audit --ledger <receipts.jsonl> [--project <repo-root>]
   chainseal schema candidate|receipt|adapter-contract
   chainseal adapter-contract
+  chainseal adapter-harness <cases.json> [--project <repo-root>]
   chainseal mcp-descriptor
   chainseal canary [repo-root]
 
@@ -122,6 +124,17 @@ try {
   if (command === "adapter-contract") {
     printJson(adapterContract());
     process.exit(0);
+  }
+
+  if (command === "adapter-harness") {
+    const file = positionals[0];
+    if (!file) {
+      throw new Error("adapter-harness requires <cases.json>");
+    }
+    const body = JSON.parse(fs.readFileSync(path.resolve(file), "utf8"));
+    const result = await adapterContractHarness(body, { projectRoot });
+    printJson(result);
+    process.exit(result.ok ? 0 : 1);
   }
 
   if (command === "mcp-descriptor") {
