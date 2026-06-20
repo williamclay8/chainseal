@@ -26,9 +26,9 @@ git diff --check
 Current dry-run package summary:
 
 ```text
-package size: 27.7 kB
-unpacked size: 93.4 kB
-total files: 30
+package size: 35.9 kB
+unpacked size: 126.2 kB
+total files: 40
 ```
 
 ## Canary Additions

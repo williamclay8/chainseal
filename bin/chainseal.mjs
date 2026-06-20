@@ -6,7 +6,9 @@ import path from "node:path";
 
 import {
   auditReceipts,
+  adapterContract,
   decide,
+  mcpDescriptor,
   readCandidate,
   recallPacket,
   storeCandidate,
@@ -21,12 +23,15 @@ function usage() {
   chainseal store <candidate.json> --ledger <receipts.jsonl> [--project <repo-root>]
   chainseal recall <query> --ledger <receipts.jsonl> [--project <repo-root>]
   chainseal audit --ledger <receipts.jsonl> [--project <repo-root>]
-  chainseal schema candidate|receipt
+  chainseal schema candidate|receipt|adapter-contract
+  chainseal adapter-contract
+  chainseal mcp-descriptor
   chainseal canary [repo-root]
 
 Aliases:
   chainseal-gate <candidate.json>
-  chainseal-canary [repo-root]`);
+  chainseal-canary [repo-root]
+  chainseal-mcp`);
 }
 
 function parseOptions(rawArgs) {
@@ -104,13 +109,23 @@ try {
 
   if (command === "schema") {
     const name = positionals[0];
-    if (!["candidate", "receipt"].includes(name)) {
-      throw new Error("schema requires candidate or receipt");
+    if (!["candidate", "receipt", "adapter-contract"].includes(name)) {
+      throw new Error("schema requires candidate, receipt, or adapter-contract");
     }
     process.stdout.write(fs.readFileSync(
       path.join(root, "schemas", `${name}.schema.json`),
       "utf8",
     ));
+    process.exit(0);
+  }
+
+  if (command === "adapter-contract") {
+    printJson(adapterContract());
+    process.exit(0);
+  }
+
+  if (command === "mcp-descriptor") {
+    printJson(mcpDescriptor());
     process.exit(0);
   }
 

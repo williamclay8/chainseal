@@ -1,0 +1,27 @@
+name: Chainseal Proof
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm install
+      - run: npm test
+      - run: npm run pack:dry
+      - run: node bin/chainseal-mcp.mjs descriptor
+      - run: git diff --check
+      - name: Run Chainseal composite proof gate
+        uses: ./

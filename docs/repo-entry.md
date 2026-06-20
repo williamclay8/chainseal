@@ -62,6 +62,15 @@ Audit a local ledger:
 chainseal audit --ledger /tmp/chainseal-receipts.jsonl --project .
 ```
 
+Inspect the adapter contract and local MCP facade:
+
+```bash
+chainseal schema adapter-contract
+chainseal adapter-contract
+chainseal mcp-descriptor
+chainseal-mcp descriptor
+```
+
 ## Stronger Check
 
 Before release work, run:

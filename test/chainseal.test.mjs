@@ -6,11 +6,15 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  adapterContract,
+  adapterWritePacket,
   auditReceipts,
   createReceipt,
   decide,
+  handleMcpRequest,
   inspectSourceRefs,
   loadReceipts,
+  mcpDescriptor,
   recallPacket,
   storeCandidate,
 } from "../lib/chainseal.js";
@@ -246,6 +250,31 @@ test("storeCandidate appends an allow receipt only when a ledger path is explici
   assert.equal(loadReceipts(ledger).length, 1);
 });
 
+test("adapterWritePacket creates a fail-closed backend-neutral write contract", () => {
+  const allowed = adapterWritePacket(candidate({
+    fact_key: "chainseal.positioning",
+  }), {
+    projectRoot: repoRoot,
+    createdAt: "2026-06-20T00:00:00.000Z",
+  });
+
+  assert.equal(allowed.ok, true);
+  assert.equal(allowed.contract.version, adapterContract().version);
+  assert.equal(allowed.operation, "memory.write");
+  assert.equal(allowed.backend_request.action, "write");
+  assert.equal(allowed.backend_request.receipt.id, allowed.receipt.id);
+  assert.equal(allowed.receipt.fact_key, "chainseal.positioning");
+
+  const blocked = adapterWritePacket(candidate({
+    content: "SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET",
+  }), { projectRoot: repoRoot });
+
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.fail_closed, true);
+  assert.equal(blocked.backend_request, null);
+  assert.equal(blocked.receipt, null);
+});
+
 test("auditReceipts flags stale source refs and secret-like receipt content", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "chainseal-audit-"));
   const ledger = path.join(dir, "receipts.jsonl");
@@ -265,6 +294,37 @@ test("auditReceipts flags stale source refs and secret-like receipt content", ()
   assert.match(audit.issues.map((issue) => issue.reason).join("\n"), /secret-like/);
 });
 
+test("auditReceipts flags review-after dates and contradictory fact keys", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "chainseal-audit-hardening-"));
+  const ledger = path.join(dir, "receipts.jsonl");
+  const first = createReceipt(candidate({
+    content: "The project release surface is npm.",
+    fact_key: "release.surface",
+    expires_or_review_after: "2026-06-01",
+  }), { decision: "allow", reasons: [], warnings: [] }, {
+    id: "release-surface-a",
+    createdAt: "2026-05-01T00:00:00.000Z",
+  });
+  const second = createReceipt(candidate({
+    content: "The project release surface is a hosted dashboard.",
+    fact_key: "release.surface",
+  }), { decision: "allow", reasons: [], warnings: [] }, {
+    id: "release-surface-b",
+    createdAt: "2026-06-20T00:00:00.000Z",
+  });
+  fs.writeFileSync(ledger, `${JSON.stringify(first)}\n${JSON.stringify(second)}\n`);
+
+  const audit = auditReceipts({
+    ledger,
+    projectRoot: repoRoot,
+    now: new Date("2026-06-20T00:00:00.000Z"),
+  });
+
+  assert.equal(audit.ok, false);
+  assert.match(audit.issues.map((issue) => issue.reason).join("\n"), /review-after date has passed/);
+  assert.match(audit.issues.map((issue) => issue.reason).join("\n"), /contradictory receipts share fact_key/);
+});
+
 test("recallPacket returns source-grounded matches as leads with verification requirements", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "chainseal-recall-"));
   const ledger = path.join(dir, "receipts.jsonl");
@@ -278,4 +338,83 @@ test("recallPacket returns source-grounded matches as leads with verification re
   assert.equal(packet.use_as, "lead");
   assert.equal(packet.matches.length, 1);
   assert.match(packet.required_verification_before_action, /source/i);
+});
+
+test("recallPacket ranks fresh receipts and surfaces contradictions", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "chainseal-recall-hardening-"));
+  const ledger = path.join(dir, "receipts.jsonl");
+  const reviewDue = createReceipt(candidate({
+    content: "Agent memory release surface uses npm.",
+    fact_key: "agent-memory.surface",
+    expires_or_review_after: "2026-06-01",
+  }), { decision: "allow", reasons: [], warnings: [] }, {
+    id: "review-due",
+    createdAt: "2026-05-01T00:00:00.000Z",
+  });
+  const current = createReceipt(candidate({
+    content: "Agent memory release surface uses GitHub and npm.",
+    fact_key: "agent-memory.surface",
+    expires_or_review_after: "2026-07-20",
+  }), { decision: "allow", reasons: [], warnings: [] }, {
+    id: "current",
+    createdAt: "2026-06-20T00:00:00.000Z",
+  });
+  fs.writeFileSync(ledger, `${JSON.stringify(reviewDue)}\n${JSON.stringify(current)}\n`);
+
+  const packet = recallPacket({
+    query: "agent memory release surface",
+    ledger,
+    projectRoot: repoRoot,
+    now: new Date("2026-06-20T00:00:00.000Z"),
+  });
+
+  assert.equal(packet.matches[0].id, "current");
+  assert.equal(packet.matches[0].freshness, "current");
+  assert.equal(packet.matches[1].freshness, "review_due");
+  assert.equal(packet.contradictions.length, 1);
+  assert.equal(packet.matches[0].requires_review, true);
+});
+
+test("local MCP facade exposes descriptor and fail-closed propose_store handler", () => {
+  const descriptor = mcpDescriptor();
+  assert.ok(descriptor.tools.some((tool) => tool.name === "chainseal_propose_store"));
+  assert.ok(descriptor.tools.some((tool) => tool.name === "chainseal_recall_packet"));
+
+  const response = handleMcpRequest({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "chainseal_propose_store",
+    params: {
+      candidate: candidate({
+        content: "SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET",
+      }),
+    },
+  }, { projectRoot: repoRoot });
+
+  assert.equal(response.jsonrpc, "2.0");
+  assert.equal(response.id, 1);
+  assert.equal(response.result.ok, false);
+  assert.equal(response.result.backend_request, null);
+
+  const unknown = handleMcpRequest({
+    jsonrpc: "2.0",
+    id: 2,
+    method: "chainseal_delete_everything",
+    params: {},
+  }, { projectRoot: repoRoot });
+
+  assert.equal(unknown.error.code, -32601);
+});
+
+test("repo exposes GitHub Action proof surfaces", () => {
+  const action = fs.readFileSync(path.join(repoRoot, "action.yml"), "utf8");
+  const workflow = fs.readFileSync(
+    path.join(repoRoot, ".github/workflows/chainseal-proof.yml"),
+    "utf8",
+  );
+
+  assert.match(action, /Chainseal Proof Gate/);
+  assert.match(action, /chainseal\.mjs" canary/);
+  assert.match(workflow, /npm test/);
+  assert.match(workflow, /npm run pack:dry/);
 });

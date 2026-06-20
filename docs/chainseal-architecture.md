@@ -238,14 +238,15 @@ It should identify:
 
 ### Phase 5: MCP Facade
 
-Status: deferred.
+Status: local alpha implemented.
 
-Only after the CLI proves useful in real workflows, expose a small local MCP facade:
+Expose a small local stdio JSON-RPC facade:
 
 - `chainseal_propose_store`
 - `chainseal_recall_packet`
 - `chainseal_audit`
 - `chainseal_receipt`
+- `chainseal_schema`
 
 Keep broad mutation tools out of the public surface unless a scoped user action requires them.
 
@@ -276,4 +277,4 @@ Minimum canaries before promotion:
 
 ## Implementation Recommendation
 
-Keep Chainseal local-first. Build the CLI gate, receipt ledger, and recall broker before promoting a local MCP facade or hosted service.
+Keep Chainseal local-first. Use the CLI gate, receipt ledger, recall broker, adapter contract, and local MCP facade as proof surfaces before adding backend-specific adapters or hosted services.

@@ -1,10 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="${1:-$(pwd)}"
-GATE="$ROOT/skills/chainseal/scripts/chainseal-gate.mjs"
-CHAINSEAL="$ROOT/bin/chainseal.mjs"
+PROJECT_ROOT="${1:-$(pwd)}"
+SCRIPT="$0"
+
+while [ -L "$SCRIPT" ]; do
+  DIR="$(CDPATH= cd -- "$(dirname -- "$SCRIPT")" && pwd)"
+  LINK="$(readlink "$SCRIPT")"
+  case "$LINK" in
+    /*) SCRIPT="$LINK" ;;
+    *) SCRIPT="$DIR/$LINK" ;;
+  esac
+done
+
+PKG_ROOT="$(CDPATH= cd -- "$(dirname -- "$SCRIPT")/../../.." && pwd)"
+GATE="$PKG_ROOT/skills/chainseal/scripts/chainseal-gate.mjs"
+CHAINSEAL="$PKG_ROOT/bin/chainseal.mjs"
+CHAINSEAL_MCP="$PKG_ROOT/bin/chainseal-mcp.mjs"
 TMPDIR="$(mktemp -d "${TMPDIR:-/tmp}/chainseal-gate.XXXXXX")"
+SOURCE_ROOT="$TMPDIR/source-root"
 fail=0
 
 say() { printf '%s\n' "$*"; }
@@ -25,7 +39,7 @@ write_json() {
 run_gate() {
   local file="$1"
   set +e
-  node "$GATE" "$TMPDIR/$file" > "$TMPDIR/$file.out" 2> "$TMPDIR/$file.err"
+  (cd "$SOURCE_ROOT" && node "$GATE" "$TMPDIR/$file" > "$TMPDIR/$file.out" 2> "$TMPDIR/$file.err")
   local status=$?
   set -e
   printf '%s' "$status"
@@ -49,7 +63,8 @@ expect_status() {
 }
 
 say "# Chainseal Canary"
-say "root=$ROOT"
+say "project_root=$PROJECT_ROOT"
+say "package_root=$PKG_ROOT"
 
 if [ ! -f "$GATE" ]; then
   bad "memory gate missing at $GATE"
@@ -60,6 +75,24 @@ if [ ! -f "$CHAINSEAL" ]; then
   bad "chainseal CLI missing at $CHAINSEAL"
   exit 1
 fi
+
+if [ ! -f "$CHAINSEAL_MCP" ]; then
+  bad "chainseal MCP binary missing at $CHAINSEAL_MCP"
+  exit 1
+fi
+
+mkdir -p "$SOURCE_ROOT/docs"
+printf '%s\n' \
+  "# Chainseal Canary Source" \
+  "" \
+  "Chainseal requires source-backed memories before storage." \
+  "This file exists so the canary can run inside any repository." \
+  > "$SOURCE_ROOT/docs/chainseal-architecture.md"
+printf '%s\n' \
+  "# Chainseal Canary Repo Entry" \
+  "" \
+  "This moved-file fixture lets the canary prove possible-match diagnostics." \
+  > "$SOURCE_ROOT/docs/repo-entry.md"
 
 write_json good.json '{
   "action": "store",
@@ -201,7 +234,7 @@ fi
 expect_status mutation.json 2 "mutation action requires review"
 
 set +e
-node "$CHAINSEAL" store "$TMPDIR/good.json" --ledger "$TMPDIR/receipts.jsonl" --project "$ROOT" > "$TMPDIR/store.out" 2> "$TMPDIR/store.err"
+node "$CHAINSEAL" store "$TMPDIR/good.json" --ledger "$TMPDIR/receipts.jsonl" --project "$SOURCE_ROOT" > "$TMPDIR/store.out" 2> "$TMPDIR/store.err"
 store_status=$?
 set -e
 if [ "$store_status" = "0" ] && [ -s "$TMPDIR/receipts.jsonl" ]; then
@@ -213,7 +246,7 @@ else
 fi
 
 set +e
-node "$CHAINSEAL" recall source-backed --ledger "$TMPDIR/receipts.jsonl" --project "$ROOT" > "$TMPDIR/recall.out" 2> "$TMPDIR/recall.err"
+node "$CHAINSEAL" recall source-backed --ledger "$TMPDIR/receipts.jsonl" --project "$SOURCE_ROOT" > "$TMPDIR/recall.out" 2> "$TMPDIR/recall.err"
 recall_status=$?
 set -e
 if [ "$recall_status" = "0" ] && grep -q '"use_as": "lead"' "$TMPDIR/recall.out"; then
@@ -225,7 +258,7 @@ else
 fi
 
 set +e
-node "$CHAINSEAL" audit --ledger "$TMPDIR/receipts.jsonl" --project "$ROOT" > "$TMPDIR/audit.out" 2> "$TMPDIR/audit.err"
+node "$CHAINSEAL" audit --ledger "$TMPDIR/receipts.jsonl" --project "$SOURCE_ROOT" > "$TMPDIR/audit.out" 2> "$TMPDIR/audit.err"
 audit_status=$?
 set -e
 if [ "$audit_status" = "0" ] && grep -q '"ok": true' "$TMPDIR/audit.out"; then
@@ -248,13 +281,91 @@ else
   cat "$TMPDIR/schema.err" || true
 fi
 
-if [ -f "$ROOT/.env" ]; then
+set +e
+node "$CHAINSEAL" schema adapter-contract > "$TMPDIR/adapter-schema.out" 2> "$TMPDIR/adapter-schema.err"
+adapter_schema_status=$?
+set -e
+if [ "$adapter_schema_status" = "0" ] && grep -q '"Chainseal Adapter Contract Packet"' "$TMPDIR/adapter-schema.out"; then
+  pass "adapter contract schema is exposed"
+else
+  bad "adapter contract schema is exposed"
+  cat "$TMPDIR/adapter-schema.out" || true
+  cat "$TMPDIR/adapter-schema.err" || true
+fi
+
+set +e
+node "$CHAINSEAL" adapter-contract > "$TMPDIR/adapter-contract.out" 2> "$TMPDIR/adapter-contract.err"
+adapter_contract_status=$?
+set -e
+if [ "$adapter_contract_status" = "0" ] && grep -q '"chainseal.adapter.v1"' "$TMPDIR/adapter-contract.out"; then
+  pass "adapter contract is backend-neutral and versioned"
+else
+  bad "adapter contract is backend-neutral and versioned"
+  cat "$TMPDIR/adapter-contract.out" || true
+  cat "$TMPDIR/adapter-contract.err" || true
+fi
+
+printf '%s\n%s\n' \
+'{"id":"canary-review-due","created_at":"2026-05-01T00:00:00.000Z","type":"semantic","scope":"project","fact_key":"chainseal.release_surface","content":"Chainseal release surface is npm only.","source_refs":[{"kind":"file","ref":"docs/chainseal-architecture.md","status":"verified"}],"evidence":{"status":"verified"},"validity":{"valid_from":"2026-05-01","valid_until":null,"invalidated_by":[]},"sensitivity":"internal","trust_tier":"source_backed","stores":["backend-local"],"expires_or_review_after":"2026-06-01","gate":{"decision":"allow","reasons":[],"warnings":[]},"lumi":{"local":"clean"}}' \
+'{"id":"canary-current","created_at":"2026-06-20T00:00:00.000Z","type":"semantic","scope":"project","fact_key":"chainseal.release_surface","content":"Chainseal release surface is GitHub and npm.","source_refs":[{"kind":"file","ref":"docs/chainseal-architecture.md","status":"verified"}],"evidence":{"status":"verified"},"validity":{"valid_from":"2026-06-20","valid_until":null,"invalidated_by":[]},"sensitivity":"internal","trust_tier":"source_backed","stores":["backend-local"],"expires_or_review_after":"2099-01-01","gate":{"decision":"allow","reasons":[],"warnings":[]},"lumi":{"local":"clean"}}' \
+> "$TMPDIR/hardening-receipts.jsonl"
+
+set +e
+node "$CHAINSEAL" audit --ledger "$TMPDIR/hardening-receipts.jsonl" --project "$SOURCE_ROOT" > "$TMPDIR/hardening-audit.out" 2> "$TMPDIR/hardening-audit.err"
+hardening_audit_status=$?
+set -e
+if [ "$hardening_audit_status" = "1" ] && grep -q "review-after date has passed" "$TMPDIR/hardening-audit.out" && grep -q "contradictory receipts share fact_key" "$TMPDIR/hardening-audit.out"; then
+  pass "audit flags review-after dates and contradictions"
+else
+  bad "audit flags review-after dates and contradictions"
+  cat "$TMPDIR/hardening-audit.out" || true
+  cat "$TMPDIR/hardening-audit.err" || true
+fi
+
+set +e
+node "$CHAINSEAL" recall "Chainseal release surface" --ledger "$TMPDIR/hardening-receipts.jsonl" --project "$SOURCE_ROOT" > "$TMPDIR/hardening-recall.out" 2> "$TMPDIR/hardening-recall.err"
+hardening_recall_status=$?
+set -e
+if [ "$hardening_recall_status" = "0" ] && grep -q '"freshness": "current"' "$TMPDIR/hardening-recall.out" && grep -q '"requires_review": true' "$TMPDIR/hardening-recall.out"; then
+  pass "recall ranks freshness and marks contradictions for review"
+else
+  bad "recall ranks freshness and marks contradictions for review"
+  cat "$TMPDIR/hardening-recall.out" || true
+  cat "$TMPDIR/hardening-recall.err" || true
+fi
+
+set +e
+node "$CHAINSEAL_MCP" descriptor > "$TMPDIR/mcp-descriptor.out" 2> "$TMPDIR/mcp-descriptor.err"
+mcp_descriptor_status=$?
+set -e
+if [ "$mcp_descriptor_status" = "0" ] && grep -q "chainseal_propose_store" "$TMPDIR/mcp-descriptor.out"; then
+  pass "local MCP descriptor exposes propose-store"
+else
+  bad "local MCP descriptor exposes propose-store"
+  cat "$TMPDIR/mcp-descriptor.out" || true
+  cat "$TMPDIR/mcp-descriptor.err" || true
+fi
+
+set +e
+printf '{"jsonrpc":"2.0","id":1,"method":"chainseal_propose_store","params":{"candidate":{"action":"store","type":"semantic","content":"SERVICE_API_KEY = BLOCKED_TEST_VALUE_NOT_A_SECRET","source_refs":[{"kind":"file","ref":"docs/chainseal-architecture.md","status":"verified"}],"evidence":{"status":"verified"},"sensitivity":"internal","target_store":"backend-local","lumi":{"local":"clean"}},"projectRoot":"%s"}}\n' "$SOURCE_ROOT" \
+| node "$CHAINSEAL_MCP" > "$TMPDIR/mcp-propose.out" 2> "$TMPDIR/mcp-propose.err"
+mcp_propose_status=$?
+set -e
+if [ "$mcp_propose_status" = "0" ] && grep -q '"backend_request":null' "$TMPDIR/mcp-propose.out"; then
+  pass "local MCP propose-store fails closed"
+else
+  bad "local MCP propose-store fails closed"
+  cat "$TMPDIR/mcp-propose.out" || true
+  cat "$TMPDIR/mcp-propose.err" || true
+fi
+
+if [ -f "$PROJECT_ROOT/.env" ]; then
   bad "repo .env exists"
 else
   pass "repo .env absent"
 fi
 
-if [ -f "$ROOT/.mcp.json" ]; then
+if [ -f "$PROJECT_ROOT/.mcp.json" ]; then
   bad "repo .mcp.json exists"
 else
   pass "repo .mcp.json absent"

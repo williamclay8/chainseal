@@ -1,20 +1,23 @@
 {
   "name": "chainseal",
-  "version": "0.3.0-alpha.0",
+  "version": "0.3.0",
   "description": "Source-backed memory firewall and trust boundary for coding agents.",
   "type": "module",
   "exports": {
     ".": "./lib/chainseal.js",
     "./schemas/candidate": "./schemas/candidate.schema.json",
-    "./schemas/receipt": "./schemas/receipt.schema.json"
+    "./schemas/receipt": "./schemas/receipt.schema.json",
+    "./schemas/adapter-contract": "./schemas/adapter-contract.schema.json"
   },
   "bin": {
     "chainseal": "bin/chainseal.mjs",
     "chainseal-gate": "bin/chainseal-gate.mjs",
-    "chainseal-canary": "bin/chainseal-canary.sh"
+    "chainseal-canary": "bin/chainseal-canary.sh",
+    "chainseal-mcp": "bin/chainseal-mcp.mjs"
   },
   "files": [
     "bin/",
+    "action.yml",
     "lib/",
     "schemas/",
     "docs/chainseal-architecture.md",
@@ -25,10 +28,14 @@
     "docs/proof-playbook.md",
     "docs/productization-roadmap.md",
     "docs/project-spine.md",
-    "docs/releases/v0.2.0-proof-release.md",
+    "docs/releases/",
     "docs/repo-entry.md",
     "docs/threat-model.md",
     "docs/v0.3/",
+    "docs/v0.4/",
+    "docs/v0.5/",
+    "docs/v0.6/",
+    "docs/pilots/",
     "skills/chainseal/SKILL.md",
     "skills/chainseal/agents/openai.yaml",
     "skills/chainseal/references/control-plane.md",
@@ -41,7 +48,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "check": "node --check lib/chainseal.js && node --check bin/chainseal.mjs && node --check skills/chainseal/scripts/chainseal-gate.mjs && bash -n skills/chainseal/scripts/chainseal-canary.sh",
+    "check": "node --check lib/chainseal.js && node --check bin/chainseal.mjs && node --check bin/chainseal-mcp.mjs && node --check skills/chainseal/scripts/chainseal-gate.mjs && bash -n skills/chainseal/scripts/chainseal-canary.sh",
     "test": "npm run check && node --test && skills/chainseal/scripts/chainseal-canary.sh .",
     "pack:dry": "npm pack --dry-run"
   },

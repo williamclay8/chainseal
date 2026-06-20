@@ -33,7 +33,7 @@ Proof target:
 
 ### v0.3: Stronger Source Verification
 
-Status: in progress.
+Status: proof release.
 
 Scope:
 
@@ -48,6 +48,8 @@ Proof target:
 
 ### v0.4: Backend Adapter Contract
 
+Status: local contract implemented, no backend adapters included.
+
 Scope:
 
 - stable interface for backend memory stores;
@@ -59,6 +61,8 @@ Proof target:
 - prove that Chainseal can sit in front of different memory backends without owning their storage model.
 
 ### v0.5: Recall Broker Hardening
+
+Status: local receipt-ledger hardening implemented.
 
 Scope:
 
@@ -73,6 +77,8 @@ Proof target:
 - show that recall improves agent usefulness without becoming hidden trusted context.
 
 ### v0.6: Local MCP Facade
+
+Status: local stdio JSON-RPC facade implemented.
 
 Scope:
 
