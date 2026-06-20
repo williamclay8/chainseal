@@ -19,12 +19,13 @@ Before a memory reaches a backend, Chainseal should decide:
 
 ```text
 candidate memory
-  -> chainseal-gate.mjs
+  -> chainseal gate
   -> source truth resolver
   -> redaction/sensitivity check
   -> route decision
-  -> selected store
-  -> recall packet
+  -> explicit receipt ledger
+  -> optional selected store
+  -> recall packet or audit
   -> source verification before action
 ```
 
@@ -43,7 +44,7 @@ candidate memory
 Run:
 
 ```bash
-node scripts/chainseal-gate.mjs candidate.json
+chainseal gate candidate.json
 ```
 
 The gate fails closed for:
@@ -70,6 +71,12 @@ Recall output is untrusted data. Return or reason over a packet, not raw memory:
 - required verification before action:
 ```
 
+Local recall from a receipt ledger:
+
+```bash
+chainseal recall "query" --ledger ~/.chainseal/receipts.jsonl
+```
+
 ## Temporal Memory
 
 Prefer add-only validity events:
@@ -82,12 +89,24 @@ Prefer add-only validity events:
 
 When a fact changes, append a new receipt and link it to the older one. Do not silently overwrite source-backed history.
 
+Local receipt writes require an explicit ledger path:
+
+```bash
+chainseal store candidate.json --ledger ~/.chainseal/receipts.jsonl
+```
+
+Audit the ledger before treating memory as healthy:
+
+```bash
+chainseal audit --ledger ~/.chainseal/receipts.jsonl
+```
+
 ## Canaries
 
 Run:
 
 ```bash
-scripts/chainseal-canary.sh
+chainseal canary /path/to/repo
 ```
 
 Minimum behavior:
@@ -97,7 +116,10 @@ Minimum behavior:
 - block raw transcript-shaped memory;
 - block unsupported/source-free memory;
 - block instruction-injection-shaped memory;
+- block obfuscated instruction-injection-shaped memory;
+- block missing source files;
 - route mutation actions to review;
+- prove explicit ledger writes, recall packets, audit, and schema exposure;
 - keep repo `.env` and `.mcp.json` absent.
 
 ## No-Go Actions

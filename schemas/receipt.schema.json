@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chainseal.dev/schemas/receipt.schema.json",
+  "title": "Chainseal Receipt",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "created_at",
+    "type",
+    "content",
+    "source_refs",
+    "evidence",
+    "validity",
+    "sensitivity",
+    "trust_tier",
+    "stores",
+    "gate"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "type": {
+      "type": "string",
+      "enum": ["episodic", "semantic", "procedural", "self_model", "introspective"]
+    },
+    "scope": { "type": "string" },
+    "content": { "type": "string" },
+    "source_refs": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "evidence": { "type": "object" },
+    "validity": {
+      "type": "object",
+      "required": ["valid_from", "valid_until", "invalidated_by"],
+      "properties": {
+        "valid_from": { "type": "string" },
+        "valid_until": { "type": ["string", "null"] },
+        "invalidated_by": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "private", "secret"]
+    },
+    "trust_tier": {
+      "type": "string",
+      "enum": ["source_backed", "blocked", "lead", "unknown"]
+    },
+    "stores": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "expires_or_review_after": { "type": "string" },
+    "gate": {
+      "type": "object",
+      "required": ["decision", "reasons", "warnings"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["allow", "block", "needs_review"]
+        },
+        "reasons": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "lumi": { "type": ["object", "null"] }
+  }
+}

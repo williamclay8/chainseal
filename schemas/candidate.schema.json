@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chainseal.dev/schemas/candidate.schema.json",
+  "title": "Chainseal Memory Candidate",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "action",
+    "type",
+    "content",
+    "source_refs",
+    "evidence",
+    "sensitivity",
+    "target_store"
+  ],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["store", "recall", "delete", "update", "list", "batch", "extract"]
+    },
+    "type": {
+      "type": "string",
+      "enum": ["episodic", "semantic", "procedural", "self_model", "introspective"]
+    },
+    "content": {
+      "type": "string",
+      "maxLength": 1200
+    },
+    "query": {
+      "type": "string"
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "ref", "status"],
+        "additionalProperties": true,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "examples": ["file", "url", "commit", "ci", "provider"]
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": ["verified", "source_backed", "current", "unsupported", "stale"]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["verified", "source_backed", "current", "unsupported", "stale"]
+        },
+        "command": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        }
+      }
+    },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["public", "internal", "private", "secret"]
+    },
+    "target_store": {
+      "type": "string",
+      "examples": ["backend-local", "repo", "task-board", "cross-session", "other"]
+    },
+    "lumi": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "local": { "type": "string" },
+        "committed": { "type": ["boolean", "string"] },
+        "pushed": { "type": ["boolean", "string"] },
+        "deployed_live": { "type": ["boolean", "string"] }
+      }
+    }
+  }
+}

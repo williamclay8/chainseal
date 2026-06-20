@@ -59,7 +59,7 @@ Deterministic preflight before any write. It checks:
 Current implementation:
 
 ```bash
-node skills/chainseal/scripts/chainseal-gate.mjs candidate.json
+chainseal gate candidate.json
 ```
 
 ### 2. Source Truth Resolver
@@ -180,8 +180,12 @@ Status: implemented in this repo.
 - Portable skill reference: `skills/chainseal/references/control-plane.md`
 - Candidate gate: `skills/chainseal/scripts/chainseal-gate.mjs`
 - Canary: `skills/chainseal/scripts/chainseal-canary.sh`
+- Library API: `lib/chainseal.js`
+- Candidate and receipt schemas: `schemas/`
 
 ### Phase 1: Receipt Ledger
+
+Status: local alpha implemented through explicit `--ledger` paths.
 
 Add a local append-only JSONL receipt file under a user-approved root:
 
@@ -189,39 +193,39 @@ Add a local append-only JSONL receipt file under a user-approved root:
 ~/.chainseal/receipts.jsonl
 ```
 
-Do not write the ledger automatically until the operator approves the path and retention policy.
+Do not write the ledger automatically. The operator must pass an explicit `--ledger` path. Retention policy is still local/operator-owned.
 
 ### Phase 2: Store Wrapper
 
-Build a wrapper command:
+Status: local receipt-only alpha implemented. Backend adapters remain deferred.
 
 ```bash
-chainseal store candidate.json --target backend-local
+chainseal store candidate.json --ledger ~/.chainseal/receipts.jsonl
 ```
 
 It should:
 
 1. run the candidate gate;
 2. write a receipt;
-3. call the selected backend only if the decision is `allow`;
-4. report exactly which store changed.
+3. call the selected backend only if the decision is `allow` and a backend adapter is explicitly configured;
+4. report exactly which ledger or store changed.
 
 ### Phase 3: Recall Broker
 
-Build:
+Status: local receipt-ledger alpha implemented.
 
 ```bash
-chainseal recall "query" --project /path/to/repo
+chainseal recall "query" --ledger ~/.chainseal/receipts.jsonl --project /path/to/repo
 ```
 
 It should search repo docs first, then configured memory stores. It should return a trust-ranked packet, not raw recalled text.
 
 ### Phase 4: Stale And Contradiction Audit
 
-Build:
+Status: local ledger audit alpha implemented.
 
 ```bash
-chainseal audit --project /path/to/repo
+chainseal audit --ledger ~/.chainseal/receipts.jsonl --project /path/to/repo
 ```
 
 It should identify:
@@ -234,7 +238,9 @@ It should identify:
 
 ### Phase 5: MCP Facade
 
-Only after the CLI proves useful, expose a small local MCP facade:
+Status: deferred.
+
+Only after the CLI proves useful in real workflows, expose a small local MCP facade:
 
 - `chainseal_propose_store`
 - `chainseal_recall_packet`

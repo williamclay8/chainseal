@@ -33,10 +33,28 @@ Do not store secrets, env values, OAuth URLs, wallet/private-key material, raw t
 Before storing, updating, deleting, batch-ingesting, extracting, or promoting memories, run the local candidate gate when available:
 
 ```bash
-node scripts/chainseal-gate.mjs candidate.json
+chainseal gate candidate.json
 ```
 
 Allowed stores are still downstream of source truth. If the candidate belongs in repo docs, an active task board, or cross-session memory rather than a local backend, route it there instead of forcing everything into one store.
+
+For local receipt writes, require an explicit ledger path:
+
+```bash
+chainseal store candidate.json --ledger ~/.chainseal/receipts.jsonl
+```
+
+Recall must return a packet with provenance and verification requirements:
+
+```bash
+chainseal recall "query" --ledger ~/.chainseal/receipts.jsonl
+```
+
+Audit local receipt ledgers before treating memory as healthy:
+
+```bash
+chainseal audit --ledger ~/.chainseal/receipts.jsonl
+```
 
 ## Tool Boundaries
 
@@ -50,7 +68,7 @@ Allowed stores are still downstream of source truth. If the candidate belongs in
 Run the canary after wiring a backend adapter or changing this skill:
 
 ```bash
-scripts/chainseal-canary.sh
+chainseal canary /path/to/repo
 ```
 
 Report local, committed, pushed, and deployed/live status. Backend data lives outside the repo, so name that boundary when memory was written.

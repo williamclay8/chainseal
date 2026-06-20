@@ -55,6 +55,31 @@ or:
 chainseal-gate candidate.json
 ```
 
+Write an allowed candidate to an explicit local receipt ledger:
+
+```bash
+chainseal store candidate.json --ledger ~/.chainseal/receipts.jsonl
+```
+
+Recall a trust-ranked packet from a local receipt ledger:
+
+```bash
+chainseal recall "source-backed memory" --ledger ~/.chainseal/receipts.jsonl
+```
+
+Audit a ledger for stale sources, source-missing receipts, secret-like content, and missing Lumi state:
+
+```bash
+chainseal audit --ledger ~/.chainseal/receipts.jsonl
+```
+
+Print the candidate or receipt schema:
+
+```bash
+chainseal schema candidate
+chainseal schema receipt
+```
+
 Run the canary suite:
 
 ```bash
@@ -105,6 +130,8 @@ The next product step is a local MCP facade exposing:
 - `chainseal_audit`
 - `chainseal_receipt`
 
+The MCP facade stays behind the CLI proof gate. Chainseal should prove the local schema, ledger, store, recall, and audit workflow before it exposes tool endpoints to agent runtimes.
+
 ## Backend Adapters
 
 Chainseal sits in front of memory backends. Backends may store or retrieve content, but Chainseal owns the trust boundary: whether a candidate is safe, sourced, current, and actionable.
@@ -115,6 +142,14 @@ Use backend recall as a lead. Verify against repo files, tests, git, CI, provide
 
 Read [SECURITY.md](SECURITY.md) before connecting Chainseal to hosted memory backends, remote MCP endpoints, vector databases, wallets, provider logs, or secret-bearing workflows.
 
+For the current threat model, read [docs/threat-model.md](docs/threat-model.md). For reproducible proof commands and expected outputs, read [docs/proof-playbook.md](docs/proof-playbook.md).
+
 ## Status
 
 MVP package published on npm as `chainseal`.
+
+Current build direction: keep Chainseal local-first, deterministic, source-backed, and backend-neutral. The near-term project is not a hosted memory service. It is the gate, receipt ledger, recall packet, and audit layer that makes existing memory systems safer to use.
+
+## Community Boundary
+
+Any community-token or contract-address references around Chainseal are not security evidence, release authority, or product trust material. Chainseal's source of truth is the repository, npm package, signed release process when added, test/canary output, and documented security policy.

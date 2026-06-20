@@ -32,8 +32,13 @@ Give your coding agent memory without letting memory become an unsourced, stale,
 Phase 1 ships as an npm CLI and skill pack:
 
 - `chainseal gate candidate.json`
+- `chainseal store candidate.json --ledger <receipts.jsonl>`
+- `chainseal recall "query" --ledger <receipts.jsonl>`
+- `chainseal audit --ledger <receipts.jsonl>`
+- `chainseal schema candidate|receipt`
 - `chainseal canary /path/to/repo`
 - source-backed memory candidate schema;
+- local append-only receipt schema;
 - replayable safety canaries;
 - portable agent workflow wrapper.
 
@@ -86,7 +91,9 @@ Completed for public npm publish:
 
 Before broader public support:
 
-- Add public issue/security contact before accepting external reports.
+- Keep public issue/security contact current.
+- Keep threat model and proof playbook current.
+- Expand adversarial fixture coverage before broader claims.
 
 Before hosted product:
 
@@ -99,11 +106,11 @@ Before hosted product:
 
 ## Immediate Next Builds
 
-1. Receipt ledger under a user-approved local path.
-2. `chainseal store` wrapper that writes only after the gate allows.
-3. `chainseal recall` broker that returns trust-ranked recall packets.
-4. `chainseal audit` for stale, source-missing, contradictory, or secret-like memories.
-5. Local MCP facade after CLI behavior proves useful.
+1. Harden source verification with line refs, optional file hashes, and moved-file diagnostics.
+2. Add fixture-based false-positive and false-negative notes for real pilot workflows.
+3. Add one local backend adapter contract after the receipt ledger gets real use.
+4. Expand `chainseal audit` for contradictions, review-after dates, and source-stale conditions.
+5. Local MCP facade only after CLI behavior proves useful.
 
 ## Launch Copy
 
