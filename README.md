@@ -1,5 +1,3 @@
-CA: 6QZ3PB6e1HuQATvryeCUqrp1Jecf8RVb9fMQzBhpump
-
 # Chainseal
 
 Only trusted memory crosses the line.
